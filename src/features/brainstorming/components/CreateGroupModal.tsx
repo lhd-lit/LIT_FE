@@ -47,7 +47,7 @@ export function CreateGroupModal({ open, onClose }: CreateGroupModalProps) {
       className="fixed inset-0 z-50 flex items-center justify-center"
       onClick={handleBackdropClick}
     >
-      <div className="absolute inset-0 bg-[#1F1A1400]/60 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
 
       <div className="relative w-[520px] max-w-[90vw] rounded-2xl bg-[#FAF8F4] shadow-2xl border border-[#E6DFD2] px-6 py-4 space-y-5">
         <header className="flex items-start justify-between">

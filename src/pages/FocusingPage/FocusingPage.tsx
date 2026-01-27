@@ -8,57 +8,46 @@ import { UploadWorkModal } from "../../shared/components/UploadWorkModal";
 import { MOCK_FOCUSING_CARDS } from "../../mock/focusing/mockData";
 
 export default function FocusingPage() {
-    const [uploadOpen, setUploadOpen] = useState(false);
+  const [uploadOpen, setUploadOpen] = useState(false);
 
-    return (
-        <>
-            <div className="flex flex-col">
-                <ControlBar
-                    title="Focusing"
-                    description="Continue your AI-assisted learning journey"
-                    icon={focusingIcon}
-                    iconAlt="focusing"
-                    searchPlaceholder="Search by title or author..."
-                    actions={
-                        <div className="flex items-center gap-4">
-                            <SortDropdown />
-                            <UploadButton onClick={() => setUploadOpen(true)} />
-                        </div>
-                    }
-                />
+  const handleCloseModal = () => setUploadOpen(false);
+  const handleOpenModal = () => setUploadOpen(true);
+  const handleSubmit = () => setUploadOpen(false);
 
-                <section className="
-                    bg-[#FAF8F4]
-                    shadow-sm
-                    p-4
-                    sm:p-6
-                ">
-                    <div className="
-                        grid
-                        grid-cols-1
-                        md:grid-cols-2
-                        xl:grid-cols-3
-                        gap-4
-                        sm:gap-6
-                    ">
-                        {MOCK_FOCUSING_CARDS.map(({ card, metadata }) => (
-                            <StudyCard key={card.id} card={card} variant="grid" metadata={metadata}>
-                            </StudyCard>
-                        ))}
-                    </div>
-                </section>
+  return (
+    <>
+      <div className="flex flex-col">
+        <ControlBar
+          title="Focusing"
+          description="Continue your AI-assisted learning journey"
+          icon={focusingIcon}
+          iconAlt="focusing"
+          searchPlaceholder="Search by title or author..."
+          actions={
+            <div className="flex items-center gap-4">
+              <SortDropdown />
+              <UploadButton onClick={handleOpenModal} />
             </div>
+          }
+        />
 
-            <UploadWorkModal
-                open={uploadOpen}
-                onClose={() => setUploadOpen(false)}
-                onSubmit={() => {
-                    setUploadOpen(false);
-                }}
-                heading="Upload Study"
-                subheading="Add a new document, PDF, or article"
-                uploadLabel="Upload Work"
-            />
-        </>
-    )
+        <section className="bg-[#FAF8F4] shadow-sm p-4 sm:p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+            {MOCK_FOCUSING_CARDS.map(({ card, metadata }) => (
+              <StudyCard key={card.id} card={card} variant="grid" metadata={metadata} />
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <UploadWorkModal
+        open={uploadOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleSubmit}
+        heading="Upload Study"
+        subheading="Add a new document, PDF, or article"
+        uploadLabel="Upload Work"
+      />
+    </>
+  );
 }
