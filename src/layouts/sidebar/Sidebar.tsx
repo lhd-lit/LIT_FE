@@ -1,8 +1,8 @@
 import { SidebarItem } from "./SidebarItem.tsx"
-import HomeIcon from "../../assets/HomeIcon.svg"
-import FocusingIcon from "../../assets/focusingIcon.svg"
-import BrainStormingIcon from "../../assets/brainstormingIcon.svg"
-import SettingsIcon from "../../assets/settingsIcon.svg"
+import HomeIcon from "../../shared/assets/homeIcon.svg"
+import FocusingIcon from "../../shared/assets/focusingIcon.svg"
+import BrainStormingIcon from "../../shared/assets/brainstormingIcon.svg"
+import SettingsIcon from "../../shared/assets/settingsIcon.svg"
 import { NavLink } from "react-router-dom"
 
 
