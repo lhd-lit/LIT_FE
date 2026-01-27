@@ -1,5 +1,5 @@
-import membersIcon from "../../../assets/membersIcon.svg"
-import commentsIcon from "../../../assets/commentsIcon.svg"
+import membersIcon from "../../../shared/assets/membersIcon.svg"
+import commentsIcon from "../../../shared/assets/commentsIcon.svg"
 
 type CardMetaDataProps = {
 
