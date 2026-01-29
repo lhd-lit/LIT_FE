@@ -24,8 +24,8 @@ export function SidebarItem({ iconSrc, label, active = false }: SidebarItemProps
             transition
             ${
                 active
-                ? "!bg-[#E8DCC8] text-[#2A2418] font-medium"
-                : "text-[#6B5D4F] hover:!bg-[#E8DCC8]/50"
+                ? "!bg-background-card text-text-primary font-medium"
+                : "text-text-secondary hover:!bg-background-card/50"
             }
             `}>
             {/* rounded-lg: 테두리 반경 0.5rem(8px) */}
@@ -34,7 +34,7 @@ export function SidebarItem({ iconSrc, label, active = false }: SidebarItemProps
             {/* transition: 모든 속성 변화에 애니메이션 적용 */}
 
             <img src={iconSrc} className="flex-shrink-0"/>
-            <span className="flex-inline text-base text-[#2A2418]">{label}</span>
+            <span className="flex-inline text-base text-text-primary">{label}</span>
         </div>
    
     )

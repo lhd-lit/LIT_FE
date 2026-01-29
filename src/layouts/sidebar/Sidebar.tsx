@@ -5,9 +5,15 @@ import FocusingIcon from "../../shared/assets/focusingIcon.svg";
 import BrainStormingIcon from "../../shared/assets/brainstormingIcon.svg";
 import SettingsIcon from "../../shared/assets/settingsIcon.svg";
 
-export function Sidebar() {
+type SidebarProps = {
+  isOpen: boolean;
+};
+
+export function Sidebar({ isOpen }: SidebarProps) {
+  if (!isOpen) return null;
+
   return (
-    <aside className="flex flex-col items-start w-64 min-h-screen border-r border-[#5A4A3A26] px-4 py-6 bg-[#F5F0E8]">
+    <aside className="flex flex-col items-start w-64 min-h-screen border-r border-border px-4 py-6 bg-background-light transition-transform">
       <nav className="flex flex-col gap-2 w-full">
         <NavLink to="/home">
           {({ isActive }) => <SidebarItem iconSrc={HomeIcon} label="Home" active={isActive} />}
