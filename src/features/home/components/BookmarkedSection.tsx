@@ -1,4 +1,4 @@
-import { StudyCard } from "./StudyCard";
+import { StudyCard } from "../../../shared/components/StudyCard";
 import type { Card, BrainStormingCard } from "../types"
 import type { ReactNode } from "react";
 
@@ -19,7 +19,7 @@ export function BookmarkedSection( {title, cards, renderBookmarkedMetaData} : Bo
             <h3 className="
                 font-playfair
                 text-lg
-                text-[#6B5D4F]
+                text-text-secondary
                 mb-4
                 pl-2"
             >

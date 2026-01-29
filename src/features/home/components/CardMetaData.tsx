@@ -16,14 +16,14 @@ export function CardMetaData({ members, comments } : CardMetaDataProps){
 
             <div className="flex flex-row">
                 <img src={membersIcon} className="mr-1"/>
-                <span className="font-inter text-xs text-[#6B5D4F]">
+                <span className="font-inter text-xs text-text-secondary">
                     {members} members
                 </span>
             </div>
 
             <div className="flex flex-row">
                 <img src={commentsIcon} className="mr-1"/>
-                <span className="font-inter text-xs text-[#6B5D4F]">
+                <span className="font-inter text-xs text-text-secondary">
                     {comments} comments
                 </span>
             </div>

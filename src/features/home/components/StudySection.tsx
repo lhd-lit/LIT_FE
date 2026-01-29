@@ -26,7 +26,7 @@ export function StudySection({
   renderBookmarkedMetaData,
 }: StudySectionProps) {
   return (
-    <section className="flex flex-col items-start gap-4 bg-white border border-[#5A4A3A26] rounded-2xl mx-8">
+    <section className="flex flex-col items-start gap-4 bg-white border border-border rounded-2xl mx-8">
       <SectionHeader icon={icon} title={title} description={description} />
 
       <RecentSection
