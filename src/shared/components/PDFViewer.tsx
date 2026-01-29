@@ -35,9 +35,7 @@ export function PDFViewer({
 
     const update = () => {
       const containerWidth = el.getBoundingClientRect().width;
-      const containerHeight = window.innerHeight - 200; // 헤더와 여백 고려
       const maxWidth = Math.max(320, Math.floor(containerWidth));
-      const maxHeight = Math.max(400, Math.floor(containerHeight));
       
       // 가로로 긴 PDF의 경우 높이를 기준으로 너비 계산
       // 세로로 긴 PDF의 경우 너비를 기준으로 사용

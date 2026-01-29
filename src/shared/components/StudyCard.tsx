@@ -69,7 +69,7 @@ export function StudyCard({
           </div>
         )}
 
-        {isHorizontal && (
+        {isHorizontal && actionLabel && (
           <button className="btn-primary mt-6">
             {actionLabel}
           </button>
@@ -78,4 +78,6 @@ export function StudyCard({
     </div>
   );
 }
+
+
 

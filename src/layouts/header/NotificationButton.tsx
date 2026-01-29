@@ -33,7 +33,7 @@ export function NotificationButton(){
                 justify-center
 
                 rounded-full
-                bg-primary
+                bg-[#6B3E2E]
                 text-white
                 text-[11px]
                 font-medium
