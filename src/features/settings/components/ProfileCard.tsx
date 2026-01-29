@@ -13,7 +13,7 @@ export function ProfileCard({ user, onEditPhoto }: ProfileCardProps) {
     <section className="
       bg-white
       border
-      border-[#5A4A3A26]
+      border-border
       rounded-2xl
       shadow-sm
       p-6
@@ -28,8 +28,8 @@ export function ProfileCard({ user, onEditPhoto }: ProfileCardProps) {
           w-20
           rounded-full
           bg-gradient-to-b
-          from-[#D9CBB1]
-          to-[#5A4A3A]
+          from-background-card
+          to-primary
           text-white
           flex
           items-center
@@ -55,7 +55,7 @@ export function ProfileCard({ user, onEditPhoto }: ProfileCardProps) {
               h-8
               w-8
               rounded-full
-              bg-[#5A4A3A]
+              bg-primary
               border-2
               border-white
             "
@@ -64,59 +64,25 @@ export function ProfileCard({ user, onEditPhoto }: ProfileCardProps) {
             <img src={CameraButtonIcon} alt="Change profile photo" className="h-4 w-4" />
           </button>
         </div>
-        <p className="text-xs text-[#6B5D4F] font-inter">Click to edit photo</p>
+        <p className="text-xs text-text-secondary font-inter">Click to edit photo</p>
       </div>
 
       <div className="w-full flex flex-col gap-3">
         <div className="flex items-center gap-6">
-          <div className="h-9 w-9 rounded-full bg-[#EFE6D8] text-[#5A4A3A] flex items-center justify-center text-xs font-inter">
+          <div className="h-9 w-9 rounded-full bg-background-hover text-primary flex items-center justify-center text-xs font-inter">
             <img src={NameIcon} alt="Name" className="h-4 w-4" />
           </div>
-          <div className="flex-1 bg-[#F7F1E6] rounded-xl px-6 py-3 flex justify-between items-center">
-            <span className="text-sm text-[#2A2418] font-playfair">{user.name}</span>
-            <button
-              type="button"
-              className="
-                inline-flex
-                items-center
-                px-3
-                py-1
-                rounded-full
-                text-xs
-                font-inter
-                bg-[#EFE6D8]
-                text-[#6B5D4F]
-                border
-                border-[#E2D7C4]
-              "
-            >
-              Click to edit
-            </button>
+          <div className="flex-1 bg-background-light rounded-xl px-6 py-3 flex justify-between items-center">
+            <span className="text-sm text-text-primary font-playfair">{user.name}</span>
           </div>
         </div>
 
         <div className="flex items-center gap-6">
-          <div className="h-9 w-9 rounded-full bg-[#EFE6D8] text-[#5A4A3A] flex items-center justify-center text-xs font-inter">
+          <div className="h-9 w-9 rounded-full bg-background-hover text-primary flex items-center justify-center text-xs font-inter">
             <img src={MailIcon} alt="Mail" className="h-4 w-4" />
           </div>
-          <div className="flex-1 bg-[#F7F1E6] rounded-xl px-6 py-3 flex justify-between gap-1">
-            <span className="text-sm text-[#2A2418] font-playfair">{user.email}</span>
-            <span className="
-              inline-flex
-              w-fit
-              items-center
-              px-3
-              py-1
-              rounded-full
-              text-xs
-              font-inter
-              bg-[#EFE6D8]
-              text-[#6B5D4F]
-              border
-              border-[#E2D7C4]
-            ">
-              Email cannot be changed
-            </span>
+          <div className="flex-1 bg-background-light rounded-xl px-6 py-3 flex justify-between gap-1">
+            <span className="text-sm text-text-primary font-playfair">{user.email}</span>
           </div>
         </div>
       </div>

@@ -13,7 +13,7 @@ export function TokenUsageCard({ stats }: TokenUsageCardProps) {
     <section className="
       bg-white
       border
-      border-[#5A4A3A26]
+      border-border
       rounded-2xl
       shadow-sm
       p-6
@@ -24,39 +24,39 @@ export function TokenUsageCard({ stats }: TokenUsageCardProps) {
       <header className="flex items-start gap-3">
         <img src={tokenIcon} alt="Token usage" className="h-12 w-12" />
         <div className="flex flex-col">
-          <h3 className="text-base font-playfair text-[#2A2418]">Token Usage</h3>
-          <p className="text-sm text-[#6B5D4F] font-inter">Track your AI assistant token consumption</p>
+          <h3 className="text-base font-playfair text-text-primary">Token Usage</h3>
+          <p className="text-sm text-text-secondary font-inter">Track your AI assistant token consumption</p>
         </div>
       </header>
 
-      <div className="flex items-center justify-between text-xs text-[#2A2418] font-inter">
+      <div className="flex items-center justify-between text-xs text-text-primary font-inter">
         <span>{stats.labelUsed}</span>
         <span>{stats.total.toLocaleString()}</span>
       </div>
-      <div className="h-2 rounded-full bg-[#ECE4D7] overflow-hidden">
+      <div className="h-2 rounded-full bg-background-lighter overflow-hidden">
         <div
-          className="h-full bg-[#5A4A3A]"
+          className="h-full bg-primary"
           style={{ width: `${percentUsed}%` }}
           aria-label={`Used ${percentUsed}% of tokens`}
         />
       </div>
-      <div className="flex items-center justify-between text-xs text-[#2A2418] font-inter">
+      <div className="flex items-center justify-between text-xs text-text-primary font-inter">
         <span>{percentUsed}% used</span>
         <span>{remaining.toLocaleString()} remaining</span>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 bg-[#F5F0E84D] border-[#5A4A3A26] border-2 rounded-xl p-4 text-center">
+      <div className="grid grid-cols-2 gap-3 bg-background-light/30 border-border border-2 rounded-xl p-4 text-center">
         <div>
-          <p className="text-2xl text-[#2A2418] font-inter">{stats.used.toLocaleString()}</p>
-          <p className="text-xs text-[#6B5D4F] font-inter">Tokens Used</p>
+          <p className="text-2xl text-text-primary font-inter">{stats.used.toLocaleString()}</p>
+          <p className="text-xs text-text-secondary font-inter">Tokens Used</p>
         </div>
         <div>
-          <p className="text-2xl text-[#2A2418] font-inter">{remaining.toLocaleString()}</p>
-          <p className="text-xs text-[#6B5D4F] font-inter">Tokens Remaining</p>
+          <p className="text-2xl text-text-primary font-inter">{remaining.toLocaleString()}</p>
+          <p className="text-xs text-text-secondary font-inter">Tokens Remaining</p>
         </div>
       </div>
 
-      <div className="flex gap-2 text-sm text-[#6B5D4F] font-inter bg-[#D4C4A833] border-[#D4C4A8] border-2 rounded-xl px-6 py-3">
+      <div className="flex gap-2 text-sm text-text-secondary font-inter bg-background-light/30 border-border border-2 rounded-xl px-6 py-3">
         <p className="flex-1">{stats.description}</p>
       </div>
     </section>

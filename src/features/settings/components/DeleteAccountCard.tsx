@@ -7,7 +7,7 @@ export function DeleteAccountCard({ onDelete }: DeleteAccountCardProps) {
     <section className="
       bg-white
       border
-      border-[#5A4A3A26]
+      border-border
       rounded-2xl
       shadow-sm
       p-6
@@ -16,8 +16,8 @@ export function DeleteAccountCard({ onDelete }: DeleteAccountCardProps) {
       items-center
       gap-4
     ">
-      <h3 className="text-lg font-playfair text-[#2A2418]">Delete Account</h3>
-      <p className="text-sm text-center text-[#6B5D4F] font-inter max-w-xl">
+      <h3 className="text-lg font-playfair text-text-primary">Delete Account</h3>
+      <p className="text-sm text-center text-text-secondary font-inter max-w-xl">
         Permanently delete your account and all associated data.
       </p>
       <button
@@ -26,11 +26,11 @@ export function DeleteAccountCard({ onDelete }: DeleteAccountCardProps) {
           px-5
           py-2.5
           rounded-lg
-          bg-[#5A4A3A]
+          bg-primary
           text-white
           text-sm
           font-inter
-          hover:bg-[#4A3A2A]
+          hover:bg-primary/90
           transition
         "
       >
