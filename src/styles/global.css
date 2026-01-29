@@ -7,3 +7,38 @@
 .font-inter {
   font-family: "Inter", sans-serif;
 }
+
+/* 공통 컴포넌트 스타일 */
+@layer components {
+  /* 카드 스타일 */
+  .card-base {
+    @apply rounded-2xl bg-white border-2 border-border shadow-sm transition;
+  }
+
+  /* 버튼 스타일 */
+  .btn-primary {
+    @apply bg-primary rounded-lg text-background font-inter text-sm px-3 py-1.5 transition hover:bg-primary/90;
+  }
+
+  .btn-secondary {
+    @apply bg-background-light border border-border rounded-lg text-text-primary font-inter text-sm px-3 py-1.5 transition hover:bg-background-card;
+  }
+
+  /* 제목 스타일 */
+  .heading-primary {
+    @apply font-playfair text-text-primary;
+  }
+
+  .heading-secondary {
+    @apply font-inter text-text-secondary;
+  }
+
+  /* 본문 텍스트 스타일 */
+  .text-body {
+    @apply font-inter text-text-secondary;
+  }
+
+  .text-body-light {
+    @apply font-inter text-text-tertiary;
+  }
+}
