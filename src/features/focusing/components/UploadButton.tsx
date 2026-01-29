@@ -15,11 +15,11 @@ export function UploadButton({ onClick }: UploadButtonProps) {
                 px-4
                 h-10
                 rounded-lg
-                bg-[#5A4A3A]
+                bg-primary
                 text-white
                 text-sm
                 font-inter
-                hover:bg-[#4A3A2A]
+                hover:bg-primary/90
                 transition
             ">
             <img src={uploadIcon} alt="upload" />
