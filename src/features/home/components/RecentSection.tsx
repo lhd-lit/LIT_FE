@@ -1,4 +1,4 @@
-import { StudyCard } from "./StudyCard"
+import { StudyCard } from "../../../shared/components/StudyCard";
 import type { Card, BrainStormingCard } from "../types"
 import { CardMetaData } from "./CardMetaData";
 import type { ReactNode } from "react";
@@ -21,7 +21,7 @@ export function RecentSection( {card, title, actionLabel, renderRecentMetaData} 
             <h3 className="
                 font-playfair
                 text-lg
-                text-[#6B5D4F]
+                text-text-secondary
                 mb-4
                 pl-2"
             >

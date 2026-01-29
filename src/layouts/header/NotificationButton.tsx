@@ -1,54 +1,53 @@
-import { useState } from "react";
-import AlertIcon from "@/layouts/assets/alertIcon.svg";
-import { NotificationPanel } from "./notifications/NotificationPanel";
-import { MOCK_NOTIFICATIONS } from "../../mock/notifications/mockData";
+import AlertIcon from "@/layouts/assets/alertIcon.svg"
 
-export function NotificationButton() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
+export function NotificationButton(){
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+    const count = 2; // 일단 하드 코딩
 
-  const handleToggle = () => {
-    setIsOpen(!isOpen);
-  };
+    return(
 
-  const handleClose = () => {
-    setIsOpen(false);
-  };
-
-  const handleMarkAllAsRead = () => {
-    setNotifications((prev) =>
-      prev.map((notification) => ({ ...notification, isRead: true }))
-    );
-  };
-
-  return (
-    <>
-      <button
-        type="button"
-        onClick={handleToggle}
-        className="relative rounded-full transition hover:bg-[#FAF8F4] p-2 hover:scale-110"
-        aria-label="Notifications"
-      >
+        <button className="
+            relative
+            rounded-full
+            
+            transition  
+        "
+        aria-label="Notifications">
+            {/* transition: 모든 속성 변화에 애니메이션 적용 */}
+        
         <div className="relative">
-          <img src={AlertIcon} className="w-5 h-5" alt="notifications" />
+            {/* relative: 상대 위치 지정 (자식 absolute 요소의 기준점) */}
+            <img src={AlertIcon} className="w-5 h-5"/>
+            
+            <span className="
+                absolute
+                top-[-10px]
+                right-[-10px]
+        
+                min-w-[18px]
+                h-[18px]
+                px-1
 
-          {unreadCount > 0 && (
-            <span className="absolute top-[-10px] right-[-10px] min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-[#6B3E2E] text-white text-[11px] font-medium">
-              {unreadCount}
+                flex
+                items-center
+                justify-center
+
+                rounded-full
+                bg-primary
+                text-white
+                text-[11px]
+                font-medium
+            "
+            >
+                {/* absolute: 절대 위치 지정 */}
+                {/* top-[-10px]: 상단에서 -10px 위치 (부모 요소 밖으로) */}
+                {/* right-[-10px]: 우측에서 -10px 위치 (부모 요소 밖으로) */}
+
+                {count}
             </span>
-          )}
         </div>
-      </button>
 
-      {isOpen && (
-        <NotificationPanel
-          notifications={notifications}
-          onMarkAllAsRead={handleMarkAllAsRead}
-          onClose={handleClose}
-        />
-      )}
-    </>
-  );
+        </button>
+    
+    )
 }

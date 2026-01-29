@@ -22,11 +22,11 @@ export function SortDropdown() {
           w-44
           rounded-lg
           border-1
-          border-[#5A4A3A26]
+          border-border
           bg-white
           text-sm
-          text-[#2A2418]
-          hover:bg-[#EFE8DA]
+          text-text-primary
+          hover:bg-background-hover
         "
       >
         <span className="flex-1 truncate text-left">{selected.label}</span>
@@ -44,7 +44,7 @@ export function SortDropdown() {
           bg-white
           shadow-lg
           border
-          border-[#5A4A3A26]
+          border-border
           overflow-hidden
           z-10
           p-2
@@ -71,8 +71,8 @@ export function SortDropdown() {
                   transition
                   font-inter
                   rounded-lg
-                  text-[#2A2418] 
-                  hover:bg-[#D9CBB1]
+                  text-text-primary 
+                  hover:bg-background-card
                   "
               >
                 {option.label}

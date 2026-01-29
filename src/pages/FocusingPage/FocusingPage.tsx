@@ -1,53 +1,48 @@
 import { useState } from "react";
-import { ControlBar } from "../../shared/components/ControlBar";
+import { useNavigate } from "react-router-dom";
+import { PageLayout } from "../../shared/components/PageLayout";
 import { SortDropdown } from "../../features/focusing/components/SortDropdown";
-import { UploadButton } from "../../features/focusing/components/UploadButton";
-import { StudyCard } from "../../features/home/components/StudyCard";
+import { StudyCard } from "../../shared/components/StudyCard";
 import focusingIcon from "../../shared/assets/focusingIcon.svg";
-import { UploadWorkModal } from "../../shared/components/UploadWorkModal";
 import { MOCK_FOCUSING_CARDS } from "../../mock/focusing/mockData";
 
 export default function FocusingPage() {
-  const [uploadOpen, setUploadOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
-  const handleCloseModal = () => setUploadOpen(false);
-  const handleOpenModal = () => setUploadOpen(true);
-  const handleSubmit = () => setUploadOpen(false);
+  const handleUploadSubmit = (_payload: { title: string; description: string; file: File | null }) => {
+    // TODO: 실제 업로드 로직 구현
+    // 업로드 후 새 문서 ID를 받아서 StudyPage로 이동
+    const newDocumentId = "new-doc-1"; // 임시 ID
+    navigate(`/focusing/study/${newDocumentId}`);
+  };
+
+  const handleCardClick = (cardId: string) => {
+    navigate(`/focusing/study/${cardId}`);
+  };
 
   return (
-    <>
-      <div className="flex flex-col">
-        <ControlBar
-          title="Focusing"
-          description="Continue your AI-assisted learning journey"
-          icon={focusingIcon}
-          iconAlt="focusing"
-          searchPlaceholder="Search by title or author..."
-          actions={
-            <div className="flex items-center gap-4">
-              <SortDropdown />
-              <UploadButton onClick={handleOpenModal} />
+    <PageLayout
+      title="Focusing"
+      description="Continue your AI-assisted learning journey"
+      icon={focusingIcon}
+      iconAlt="focusing"
+      searchPlaceholder="Search by title or author..."
+      searchValue={searchQuery}
+      onSearchChange={setSearchQuery}
+      actions={<SortDropdown />}
+      enableUpload={true}
+      onUploadSubmit={handleUploadSubmit}
+    >
+      <section className="bg-background shadow-sm p-4 sm:p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+          {MOCK_FOCUSING_CARDS.map(({ card, metadata }) => (
+            <div key={card.id} onClick={() => handleCardClick(card.id)} className="cursor-pointer">
+              <StudyCard card={card} variant="grid" metadata={metadata} />
             </div>
-          }
-        />
-
-        <section className="bg-[#FAF8F4] shadow-sm p-4 sm:p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-            {MOCK_FOCUSING_CARDS.map(({ card, metadata }) => (
-              <StudyCard key={card.id} card={card} variant="grid" metadata={metadata} />
-            ))}
-          </div>
-        </section>
-      </div>
-
-      <UploadWorkModal
-        open={uploadOpen}
-        onClose={handleCloseModal}
-        onSubmit={handleSubmit}
-        heading="Upload Study"
-        subheading="Add a new document, PDF, or article"
-        uploadLabel="Upload Work"
-      />
-    </>
+          ))}
+        </div>
+      </section>
+    </PageLayout>
   );
 }

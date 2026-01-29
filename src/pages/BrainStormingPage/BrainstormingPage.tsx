@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ControlBar } from "../../shared/components/ControlBar";
+import { PageLayout } from "../../shared/components/PageLayout";
 import brainstormingIcon from "../../shared/assets/brainstormingIcon.svg";
 import { CreateGroupButton } from "../../features/brainstorming/components/CreateGroupButton";
 import { CreateGroupModal } from "../../features/brainstorming/components/CreateGroupModal";
@@ -13,23 +13,23 @@ export default function BrainStormingPage() {
   const handleCloseModal = () => setIsModalOpen(false);
 
   return (
-    <div className="flex flex-col">
-      <ControlBar
+    <>
+      <PageLayout
         title="Brain Storming"
         description="Collaborate with classmates on literary works"
         icon={brainstormingIcon}
         iconAlt="brainstorming"
         searchPlaceholder="Search study groups..."
         actions={<CreateGroupButton onClick={handleOpenModal} />}
-      />
-
-      <section className="bg-[#FAF8F4] p-4 sm:p-6 flex flex-col gap-4">
-        {MOCK_STUDY_GROUPS.map((group) => (
-          <GroupCard key={group.id} group={group} />
-        ))}
-      </section>
+      >
+        <section className="bg-background p-4 sm:p-6 flex flex-col gap-4">
+          {MOCK_STUDY_GROUPS.map((group) => (
+            <GroupCard key={group.id} group={group} />
+          ))}
+        </section>
+      </PageLayout>
 
       <CreateGroupModal open={isModalOpen} onClose={handleCloseModal} />
-    </div>
+    </>
   );
 }

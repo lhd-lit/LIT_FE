@@ -22,7 +22,7 @@ export function SearchBar({
             max-w-md
             rounded-lg
             border-2
-            border-[#8B7355]
+            border-border
             bg-white
         ">
             <img src={searchIcon} alt="search"/>
@@ -35,8 +35,8 @@ export function SearchBar({
                     flex-1
                     font-inter
                     text-sm
-                    text-[#8B7355]
-                    placeholder-[#8B7355]
+                    text-text-tertiary
+                    placeholder-text-tertiary
                     outline-none
                     bg-transparent
                 "

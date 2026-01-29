@@ -26,7 +26,7 @@ export function BrandHeader() {
                 font-playfair 
                 text-lg 
                 leading-7 
-                text-[#2A2418]"
+                text-text-primary"
             >
                 Literature In Together
             </h1>
@@ -39,7 +39,7 @@ export function BrandHeader() {
                 font-inter 
                 text-base
                 leading-[26px] 
-                text-[#6B5D4F]"
+                text-text-secondary"
             >
                 AI assistant for understanding English Literature
             </p>

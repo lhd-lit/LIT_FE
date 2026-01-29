@@ -72,7 +72,7 @@ export function UploadWorkModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-[#1F1A1400]/60 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
 
       <div
         className="
@@ -80,10 +80,10 @@ export function UploadWorkModal({
           w-[600px]
           max-w-[92vw]
           rounded-2xl
-          bg-[#F4EEE2]
+          bg-background-light
           shadow-2xl
           border
-          border-[#E6DFD2]
+          border-border-light
           px-6
           py-5
           space-y-5
@@ -92,11 +92,11 @@ export function UploadWorkModal({
         <header className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-playfair text-[#2A2418]">
+              <h2 className="text-lg font-playfair text-text-primary">
                 {heading}
               </h2>
             </div>
-            <p className="text-sm text-[#6B5D4F] font-inter">
+            <p className="text-sm text-text-secondary font-inter">
               {subheading}
             </p>
           </div>
@@ -104,7 +104,7 @@ export function UploadWorkModal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="text-xl text-[#6B5D4F] hover:text-[#2A2418]"
+            className="text-xl text-text-secondary hover:text-text-primary"
           >
             <span aria-hidden="true">&times;</span>
           </button>
@@ -126,7 +126,7 @@ export function UploadWorkModal({
               text-center
               transition
               cursor-pointer
-              ${dragActive ? "border-[#5A4A3A] bg-[#EFE6D8]" : "border-[#D0C4B5] bg-[#FDFBF7]"}
+              ${dragActive ? "border-primary bg-background-hover" : "border-border bg-white"}
             `}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -140,21 +140,21 @@ export function UploadWorkModal({
               className="hidden"
               onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
             />
-            <div className="flex items-center justify-center w-14 h-14 rounded-full bg-[#EFE6D8] text-3xl text-[#5A4A3A]">
+            <div className="flex items-center justify-center w-14 h-14 rounded-full bg-background-hover text-3xl text-primary">
               <img src= {UploadIcon} alt = "upload icon" className = "w-8 h-8"/>
             </div>
             <div className="space-y-1">
-              <p className="text-base font-inter text-[#2A2418]">
+              <p className="text-base font-inter text-text-primary">
                 {fileName ? fileName : "Click to upload or drag and drop"}
               </p>
-              <p className="text-xs text-[#8B7355] font-inter">
+              <p className="text-xs text-text-tertiary font-inter">
                 {maxSizeText}
               </p>
             </div>
           </label>
 
           <div className="space-y-2">
-            <label className="block text-sm font-inter text-[#2A2418]">Title</label>
+            <label className="block text-sm font-inter text-text-primary">Title</label>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -164,22 +164,22 @@ export function UploadWorkModal({
                 h-10
                 rounded-lg
                 border-2
-                border-[#8B7355]
+                border-border
                 px-3
                 text-sm
-                text-[#2A2418]
+                text-text-primary
                 font-inter
-                placeholder-[#9A8C7A]
+                placeholder-text-tertiary
                 focus:outline-none
                 focus:ring-2
-                focus:ring-[#5A4A3A]
+                focus:ring-primary
                 bg-white
               "
             />
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-inter text-[#2A2418]">Description (Optional)</label>
+            <label className="block text-sm font-inter text-text-primary">Description (Optional)</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -189,16 +189,16 @@ export function UploadWorkModal({
                 w-full
                 rounded-lg
                 border-2
-                border-[#8B7355]
+                border-border
                 px-3
                 py-2
                 text-sm
-                text-[#2A2418]
+                text-text-primary
                 font-inter
-                placeholder-[#9A8C7A]
+                placeholder-text-tertiary
                 focus:outline-none
                 focus:ring-2
-                focus:ring-[#5A4A3A]
+                focus:ring-primary
                 bg-white
                 resize-none
               "
@@ -215,9 +215,9 @@ export function UploadWorkModal({
                 rounded-lg
                 text-sm
                 font-inter
-                text-[#2A2418]
-                bg-[#EFE6D8]
-                hover:bg-[#E5DAC9]
+                text-text-primary
+                bg-background-hover
+                hover:bg-background-card
               "
             >
               Cancel
@@ -231,8 +231,8 @@ export function UploadWorkModal({
                 text-sm
                 font-inter
                 text-white
-                bg-[#5A4A3A]
-                hover:bg-[#4A3A2A]
+                bg-primary
+                hover:bg-primary/90
                 transition
               "
             >
