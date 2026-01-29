@@ -19,7 +19,7 @@ export function GoogleLoginButton() {
                 text-gray-700
                 rounded-lg 
                 border-2
-                border-[#D1D5DC] 
+                border-gray-300 
                 bg-white 
 
                 hover:bg-gray-50
@@ -33,7 +33,7 @@ export function GoogleLoginButton() {
                 active:shadow-inner
                 active:scale-[0.98]
                 active:bg-gray-100
-                active:ring-[#C5CAD3]
+                active:ring-gray-300
             "
             >
 
@@ -49,7 +49,7 @@ export function GoogleLoginButton() {
                     <span className="
                         font-inter
                         text-sm 
-                        text-[#2A2418]">
+                        text-text-primary">
                         Continue with Google
                     </span>
                         {/* text-sm: 폰트 크기 0.875rem(14px) */}
