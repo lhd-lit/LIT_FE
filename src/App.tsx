@@ -9,8 +9,8 @@ import SettingsPage from "./pages/SettingsPage/SettingsPage";
 import GroupDetailPage from "./pages/GroupDetailPage/GroupDetailPage";
 import StudyPage from "./pages/StudyPage/StudyPage";
 import GroupStudyPage from "./pages/GroupStudyPage/GroupStudyPage";
-import { ProtectedRoute } from "./shared/components/ProtectedRoute";
-import { PublicRoute } from "./shared/components/PublicRoute";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { PublicRoute } from "./components/PublicRoute";
 
 function App() {
   return (
