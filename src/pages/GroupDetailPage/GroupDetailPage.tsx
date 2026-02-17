@@ -42,7 +42,7 @@ export default function GroupDetailPage() {
   const convertWorkToCard = (work: GroupWork): Card => ({
     id: work.id,
     title: work.title,
-    author: work.author,
+    author: work.author || 'Unknown',
     thumbnail: work.pdfPath || '/default-thumbnail.png', // 기본 썸네일 또는 pdfPath 사용
   });
 

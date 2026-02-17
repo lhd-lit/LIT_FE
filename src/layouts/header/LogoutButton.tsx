@@ -1,4 +1,4 @@
-import LogoutIcon from "@/layouts/assets/logoutIcon.svg"
+import LogoutIcon from "../assets/logoutIcon.svg"
 
 export function LogoutButton(){
 

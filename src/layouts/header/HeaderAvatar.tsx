@@ -1,4 +1,4 @@
-import DefaultAvatar from "@/layouts/assets/defaultAvatar.png"
+import DefaultAvatar from "../assets/defaultAvatar.png"
 
 export function HeaderAvatar(){
 

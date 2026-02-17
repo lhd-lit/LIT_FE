@@ -33,7 +33,16 @@ export const useLoginSuccess = (): UseLoginSuccessReturn => {
             return hashParams.get('accessToken') || hashParams.get('token');
           })();
 
+        console.log('[useLoginSuccess] URL 파라미터 확인:', {
+          searchParams_accessToken: searchParams.get('accessToken'),
+          searchParams_token: searchParams.get('token'),
+          hash: window.location.hash,
+          token: token ? `${token.substring(0, 20)}...${token.substring(token.length - 20)}` : null,
+          tokenLength: token?.length,
+        });
+
         if (!token) {
+          console.error('[useLoginSuccess] 토큰이 없습니다');
           setError('토큰이 없습니다.');
           setTimeout(() => {
             navigate('/', { replace: true });
@@ -41,15 +50,27 @@ export const useLoginSuccess = (): UseLoginSuccessReturn => {
           return;
         }
 
+        console.log('[useLoginSuccess] 토큰 추출 완료:', {
+          tokenLength: token.length,
+          tokenPreview: `${token.substring(0, 30)}...${token.substring(token.length - 30)}`,
+          tokenFull: token, // 디버깅용 전체 토큰 값
+        });
+        
         // 토큰 저장
+        console.log('[useLoginSuccess] 토큰 저장 시작');
         handleLoginSuccess(token);
+        console.log('[useLoginSuccess] 토큰 저장 완료');
 
         // 사용자 정보 확인
+        console.log('[useLoginSuccess] 사용자 정보 조회 시작');
         const user = await getCurrentUser();
+        console.log('[useLoginSuccess] 사용자 정보 조회 결과:', user);
+        
         if (user) {
-          console.log('로그인 성공:', user.email);
+          console.log('[useLoginSuccess] 로그인 성공:', user.email);
           navigate('/home', { replace: true });
         } else {
+          console.error('[useLoginSuccess] 사용자 정보를 가져올 수 없습니다');
           setError('사용자 정보를 가져올 수 없습니다.');
           setTimeout(() => {
             navigate('/', { replace: true });

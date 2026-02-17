@@ -9,12 +9,12 @@
  */
 
 import { app, BrowserWindow, shell, ipcMain } from "electron";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
+import { join } from "path";
 import { existsSync } from "fs";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// CommonJS로 컴파일되므로 __dirname이 자동으로 제공됨
+// TypeScript 컴파일러가 인식하지 못하므로 명시적으로 선언
+declare const __dirname: string;
 
 // 커스텀 프로토콜 스킴
 const PROTOCOL_SCHEME = 'lit';
@@ -31,7 +31,8 @@ let mainWindow: BrowserWindow | null = null;
 const createWindow = () => {
   // preload 스크립트 경로 설정
   // __dirname은 dist-electron 폴더를 가리킴 (개발/프로덕션 모두)
-  const preloadPath = join(__dirname, "preload.js");
+  // CommonJS로 컴파일되므로 .cjs 확장자 사용
+  const preloadPath = join(__dirname, "preload.cjs");
   
   // preload 파일 존재 확인
   if (!existsSync(preloadPath)) {

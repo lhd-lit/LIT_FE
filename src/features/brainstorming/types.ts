@@ -16,4 +16,13 @@ export type Member = {
   initials: string;
 };
 
+export type GroupWork = {
+  id: string;
+  title: string;
+  author?: string;
+  description?: string;
+  pdfPath?: string;
+  members?: number;
+};
+
 

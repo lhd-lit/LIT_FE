@@ -1,7 +1,7 @@
 import { useLoginSuccess } from '../../features/auth/hooks/useLoginSuccess';
 
 export default function LoginSuccessPage() {
-  const { error, isLoading } = useLoginSuccess();
+  const { error } = useLoginSuccess();
 
   return (
     <div className="min-h-screen flex items-center justify-center">

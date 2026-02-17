@@ -1,4 +1,4 @@
-import AlertIcon from "@/layouts/assets/alertIcon.svg"
+import AlertIcon from "../assets/alertIcon.svg"
 
 export function NotificationButton(){
 

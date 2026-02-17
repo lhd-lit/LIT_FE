@@ -11,6 +11,8 @@ import { DeleteAccountCard } from '../../features/settings/components/DeleteAcco
 export default function SettingsPage() {
   const { user, loading, error } = useUserProfile();
 
+  console.log('[SettingsPage] 상태:', { user, loading, error });
+
   if (loading) {
     return (
       <div className="flex flex-col gap-6 px-4 pb-10">
