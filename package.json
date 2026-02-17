@@ -1,15 +1,25 @@
 {
   "name": "study-fe",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "LIT - AI-assisted learning platform",
+  "author": "LIT Team",
+  "homepage": "./",
   "type": "module",
+  "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:electron": "tsc -p tsconfig.electron.json && vite build",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
+    "electron:build": "npm run build:electron && electron-builder",
+    "electron:build:win": "npm run build:electron && electron-builder --win",
+    "electron:build:mac": "npm run build:electron && electron-builder --mac",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "axios": "^1.13.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-pdf": "^10.3.0",
@@ -23,6 +33,9 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "autoprefixer": "^10.4.22",
+    "concurrently": "^9.2.1",
+    "electron": "^40.1.0",
+    "electron-builder": "^26.4.0",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
@@ -31,9 +44,73 @@
     "tailwindcss": "^4.1.18",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
-    "vite": "npm:rolldown-vite@7.2.5"
+    "vite": "npm:rolldown-vite@7.2.5",
+    "wait-on": "^9.0.3"
   },
   "overrides": {
     "vite": "npm:rolldown-vite@7.2.5"
+  },
+  "build": {
+    "appId": "com.lit.study-app",
+    "productName": "LIT",
+    "directories": {
+      "output": "release"
+    },
+    "protocols": [
+      {
+        "name": "lit",
+        "schemes": ["lit"]
+      }
+    ],
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "public/appLogo.png",
+        "to": "appLogo.png"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "public/appLogo.png",
+      "forceCodeSigning": false
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "public/appLogo.png",
+      "category": "public.app-category.education"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "LIT",
+      "installerIcon": "public/appLogo.ico",
+      "uninstallerIcon": "public/appLogo.ico",
+      "installerHeaderIcon": "public/appLogo.ico",
+      "deleteAppDataOnUninstall": false,
+      "runAfterFinish": true,
+      "menuCategory": "Education"
+    }
   }
 }
