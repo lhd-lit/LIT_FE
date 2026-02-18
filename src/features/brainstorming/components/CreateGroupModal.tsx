@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import searchIcon from "../../../shared/assets/searchIcon.svg";
+import { createGroup } from "../api/groups.api";
 
 type CreateGroupModalProps = {
   open: boolean;
@@ -11,21 +12,46 @@ export function CreateGroupModal({ open, onClose }: CreateGroupModalProps) {
   const [groupName, setGroupName] = useState("");
   const [description, setDescription] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // TODO: API 연동으로 멤버 목록 가져오기
   const filteredMembers: any[] = [];
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // TODO: Hook up to API when available
-    handleReset();
-    onClose();
+    if (isSubmitting) return;
+
+    const name = groupName.trim();
+    if (!name) {
+      setSubmitError("Group Name is required.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setSubmitError(null);
+      await createGroup({ name, description: description.trim() || undefined });
+      handleReset();
+      onClose();
+    } catch (err: any) {
+      // 백엔드는 GlobalResponse 구조로 에러를 반환
+      const errorData = err?.response?.data;
+      const message =
+        errorData?.message || // GlobalResponse의 message 필드
+        err?.message ||
+        "Failed to create group. Please try again.";
+      setSubmitError(String(message));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = () => {
     setGroupName("");
     setDescription("");
     setSearchQuery("");
+    setSubmitError(null);
   };
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -121,17 +147,25 @@ export function CreateGroupModal({ open, onClose }: CreateGroupModalProps) {
             <button
               type="button"
               onClick={onClose}
+              disabled={isSubmitting}
               className="px-4 py-2 rounded-lg text-sm font-inter text-text-primary bg-background-light hover:bg-background-hover transition"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-lg text-sm font-inter text-white bg-primary hover:bg-primary/90 transition"
+              disabled={isSubmitting}
+              className="px-5 py-2 rounded-lg text-sm font-inter text-white bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed transition"
             >
-              Create Group
+              {isSubmitting ? "Creating..." : "Create Group"}
             </button>
           </div>
+
+          {submitError && (
+            <div className="text-sm text-red-600 font-inter" role="alert">
+              {submitError}
+            </div>
+          )}
         </form>
       </div>
     </div>
