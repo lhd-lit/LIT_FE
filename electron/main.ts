@@ -36,10 +36,7 @@ const createWindow = () => {
   
   // preload 파일 존재 확인
   if (!existsSync(preloadPath)) {
-    console.error(`[Preload] 파일을 찾을 수 없습니다: ${preloadPath}`);
-    console.error(`[Preload] __dirname: ${__dirname}`);
-  } else {
-    console.log(`[Preload] 파일 로드 성공: ${preloadPath}`);
+    console.error(`Preload 파일을 찾을 수 없습니다: ${preloadPath}`);
   }
 
   const win = new BrowserWindow({
@@ -71,15 +68,6 @@ const createWindow = () => {
     win.loadFile(join(__dirname, "../dist/index.html"));
   }
 
-  // preload 로드 확인
-  win.webContents.once('did-finish-load', () => {
-    win.webContents.executeJavaScript(`
-      console.log('[Electron] electronAPI 사용 가능:', typeof window.electronAPI !== 'undefined');
-      if (window.electronAPI) {
-        console.log('[Electron] openExternal 사용 가능:', typeof window.electronAPI.openExternal === 'function');
-      }
-    `).catch(console.error);
-  });
 };
 
 /**
@@ -87,8 +75,6 @@ const createWindow = () => {
  * lit://login-success?accessToken=... 형식
  */
 const handleProtocolUrl = (url: string) => {
-  console.log(`[Protocol] URL 수신: ${url}`);
-
   if (!url.startsWith(`${PROTOCOL_SCHEME}://`)) {
     return;
   }
@@ -100,8 +86,6 @@ const handleProtocolUrl = (url: string) => {
     const path = urlObj.pathname;
     const fullPath = hostname + path; // "login-success" + "/"
     const token = urlObj.searchParams.get('accessToken') || urlObj.searchParams.get('token');
-
-    console.log(`[Protocol] hostname: ${hostname}, path: ${path}, fullPath: ${fullPath}, 토큰 존재: ${!!token}`);
 
     // hostname 또는 fullPath에서 login-success 확인
     const isLoginSuccess = hostname.includes('login-success') || fullPath.includes('login-success') || path.includes('login-success');
@@ -121,7 +105,7 @@ const handleProtocolUrl = (url: string) => {
       }
     }
   } catch (error) {
-    console.error('[Protocol] URL 처리 실패:', error);
+    console.error('URL 처리 실패:', error);
   }
 };
 
@@ -149,7 +133,7 @@ const navigateToLoginSuccess = (token: string) => {
       mainWindow.restore();
     }
   } catch (error) {
-    console.error('[Navigation] 로그인 성공 페이지 이동 실패:', error);
+    console.error('로그인 성공 페이지 이동 실패:', error);
   }
 };
 
@@ -161,7 +145,7 @@ ipcMain.handle('open-external', async (_event, url: string) => {
     await shell.openExternal(url);
     return true;
   } catch (error) {
-    console.error('[IPC] 외부 URL 열기 실패:', error);
+    console.error('외부 URL 열기 실패:', error);
     return false;
   }
 });
@@ -173,10 +157,7 @@ app.whenReady().then(() => {
   // 커스텀 프로토콜 등록 (Windows/Linux)
   if (process.platform === 'win32' || process.platform === 'linux') {
     if (!app.isDefaultProtocolClient(PROTOCOL_SCHEME)) {
-      const result = app.setAsDefaultProtocolClient(PROTOCOL_SCHEME);
-      console.log(`[Protocol] 등록 결과: ${result}`);
-    } else {
-      console.log(`[Protocol] 이미 등록됨: ${PROTOCOL_SCHEME}`);
+      app.setAsDefaultProtocolClient(PROTOCOL_SCHEME);
     }
   }
 

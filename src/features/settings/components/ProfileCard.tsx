@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import CameraButtonIcon from "../assets/CameraButtonIcon.svg";
 import type { UserProfile } from "../types";
 import NameIcon from "../assets/nameIcon.svg";
@@ -6,9 +7,43 @@ import MailIcon from "../assets/emailIcon.svg";
 type ProfileCardProps = {
   user: UserProfile;
   onEditPhoto?: () => void;
+  onImageChange?: (imageUrl: string) => void;
 };
 
-export function ProfileCard({ user, onEditPhoto }: ProfileCardProps) {
+const PROFILE_IMAGE_KEY = 'profileImage';
+
+export function ProfileCard({ user, onEditPhoto, onImageChange }: ProfileCardProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(
+    user.profileImageUrl || localStorage.getItem(PROFILE_IMAGE_KEY)
+  );
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // 이미지 파일만 허용
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일만 업로드할 수 있습니다.');
+      return;
+    }
+
+    // FileReader를 사용하여 이미지를 base64로 변환
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const imageUrl = reader.result as string;
+      setProfileImage(imageUrl);
+      localStorage.setItem(PROFILE_IMAGE_KEY, imageUrl);
+      onImageChange?.(imageUrl);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCameraClick = () => {
+    fileInputRef.current?.click();
+    onEditPhoto?.();
+  };
+
   return (
     <section className="
       bg-white
@@ -23,28 +58,45 @@ export function ProfileCard({ user, onEditPhoto }: ProfileCardProps) {
       items-center
     ">
       <div className="flex flex-col items-center gap-3">
-        <div className="
-          h-20
-          w-20
-          rounded-full
-          bg-gradient-to-b
-          from-background-card
-          to-primary
-          text-white
-          flex
-          items-center
-          justify-center
-          text-xl
-          font-inter
-          shadow
-          relative
-          border-2
-          border-white
-        ">
-          <span>{user.initials}</span>
+        <div className="relative">
+          <div className="
+            h-20
+            w-20
+            rounded-full
+            bg-gradient-to-b
+            from-background-card
+            to-primary
+            text-white
+            flex
+            items-center
+            justify-center
+            text-xl
+            font-inter
+            shadow
+            border-2
+            border-white
+            overflow-hidden
+          ">
+            {profileImage ? (
+              <img
+                src={profileImage}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span>{user.initials}</span>
+            )}
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleImageUpload}
+          />
           <button
             type="button"
-            onClick={onEditPhoto}
+            onClick={handleCameraClick}
             className="
               flex
               items-center
@@ -58,6 +110,8 @@ export function ProfileCard({ user, onEditPhoto }: ProfileCardProps) {
               bg-primary
               border-2
               border-white
+              z-10
+              shadow-md
             "
             aria-label="Change profile photo"
           >

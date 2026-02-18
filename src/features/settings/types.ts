@@ -2,6 +2,7 @@ export type UserProfile = {
   name: string;
   email: string;
   initials: string;
+  profileImageUrl?: string | null;
 };
 
 export type UsageStats = {
