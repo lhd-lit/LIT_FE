@@ -1,6 +1,7 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { Card } from "../../features/home/types";
 import { CardMenu } from "./CardMenu";
+import defaultThumbnail from "../../mock/book1.jpg";
 
 type CardLayout = "horizontal" | "grid";
 
@@ -29,6 +30,7 @@ export function StudyCard({
 }: StudyCardProps) {
   const isHorizontal = variant === "horizontal";
   const lastOpened = metadata?.lastOpened;
+  const [imageError, setImageError] = useState(false);
 
   const handleAddToFavorites = () => {
     onAddToFavorites?.();
@@ -38,13 +40,18 @@ export function StudyCard({
     onDelete?.();
   };
 
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   return (
     <div
       className={`card-base relative ${isHorizontal ? "flex" : "hover:shadow-md cursor-pointer"}`}
     >
       <img
-        src={card.thumbnail}
+        src={imageError ? defaultThumbnail : card.thumbnail}
         alt={`${card.title} by ${card.author}`}
+        onError={handleImageError}
         className={`object-cover ${
           isHorizontal ? "w-32 h-44 border-transparent rounded-l-2xl" : "rounded-t-2xl w-full h-40"
         }`}
