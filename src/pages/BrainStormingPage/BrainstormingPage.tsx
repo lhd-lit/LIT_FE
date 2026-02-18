@@ -4,7 +4,6 @@ import brainstormingIcon from "../../shared/assets/brainstormingIcon.svg";
 import { CreateGroupButton } from "../../features/brainstorming/components/CreateGroupButton";
 import { CreateGroupModal } from "../../features/brainstorming/components/CreateGroupModal";
 import { GroupCard } from "../../features/brainstorming/components/GroupCard";
-import { MOCK_STUDY_GROUPS } from "../../mock/brainstorming/mockData";
 
 export default function BrainStormingPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,9 +22,10 @@ export default function BrainStormingPage() {
         actions={<CreateGroupButton onClick={handleOpenModal} />}
       >
         <section className="bg-background p-4 sm:p-6 flex flex-col gap-4">
-          {MOCK_STUDY_GROUPS.map((group) => (
-            <GroupCard key={group.id} group={group} />
-          ))}
+          {/* TODO: API 연동으로 그룹 목록 가져오기 */}
+          <div className="text-center py-12 text-text-secondary">
+            <p className="text-sm font-inter">No study groups found</p>
+          </div>
         </section>
       </PageLayout>
 

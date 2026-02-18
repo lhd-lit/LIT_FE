@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 
 type RecentSectionProps = {
 
-    card : Card;
+    card : Card | null;
     title : string;
     actionLabel : string;
     renderRecentMetaData?: (card: BrainStormingCard) => ReactNode;
@@ -12,6 +12,25 @@ type RecentSectionProps = {
 }
 
 export function RecentSection( {card, title, actionLabel, renderRecentMetaData} : RecentSectionProps ){
+
+    if (!card) {
+        return (
+            <div className="w-full p-6">
+                <h3 className="
+                    font-playfair
+                    text-lg
+                    text-text-secondary
+                    mb-4
+                    pl-2"
+                >
+                    Recent {title}
+                </h3>
+                <div className="text-center py-8 text-text-secondary">
+                    <p className="text-sm font-inter">No recent study found</p>
+                </div>
+            </div>
+        );
+    }
 
     return(
 

@@ -8,7 +8,7 @@ type StudySectionProps = {
   icon: string;
   title: string;
   description: string;
-  recentCard: Card;
+  recentCard: Card | null;
   bookmarkedCards: Card[];
   actionLabel: string;
   renderRecentMetaData?: (card: BrainStormingCard) => ReactNode;

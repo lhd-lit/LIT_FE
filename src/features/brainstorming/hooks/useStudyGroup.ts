@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import { MOCK_STUDY_GROUPS } from "../../../mock/brainstorming/mockData";
-import { MOCK_GROUP_WORKS } from "../../../mock/brainstorming/groupWorksMockData";
 
 export function useStudyGroup(groupId: string | undefined) {
   const [group, setGroup] = useState<any>(null);
@@ -15,11 +13,8 @@ export function useStudyGroup(groupId: string | undefined) {
     }
 
     // TODO: 실제 API 연동
-    const foundGroup = MOCK_STUDY_GROUPS.find((g) => g.id === groupId);
-    const foundWorks = MOCK_GROUP_WORKS[groupId] || [];
-
-    setGroup(foundGroup);
-    setWorks(foundWorks);
+    setGroup(null);
+    setWorks([]);
     setLoading(false);
   }, [groupId]);
 

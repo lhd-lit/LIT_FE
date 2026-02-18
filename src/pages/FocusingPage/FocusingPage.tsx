@@ -4,7 +4,6 @@ import { PageLayout } from "../../shared/components/PageLayout";
 import { SortDropdown } from "../../features/focusing/components/SortDropdown";
 import { StudyCard } from "../../shared/components/StudyCard";
 import focusingIcon from "../../shared/assets/focusingIcon.svg";
-import { MOCK_FOCUSING_CARDS } from "../../mock/focusing/mockData";
 
 export default function FocusingPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -35,12 +34,12 @@ export default function FocusingPage() {
       onUploadSubmit={handleUploadSubmit}
     >
       <section className="bg-background shadow-sm p-4 sm:p-6">
+        {/* TODO: API 연동으로 데이터 가져오기 */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-          {MOCK_FOCUSING_CARDS.map(({ card, metadata }) => (
-            <div key={card.id} onClick={() => handleCardClick(card.id)} className="cursor-pointer">
-              <StudyCard card={card} variant="grid" metadata={metadata} />
-            </div>
-          ))}
+          {/* 데이터가 없을 때 표시할 메시지 */}
+          <div className="col-span-full text-center py-12 text-text-secondary">
+            <p className="text-sm font-inter">No study documents found</p>
+          </div>
         </div>
       </section>
     </PageLayout>

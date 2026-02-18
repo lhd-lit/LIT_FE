@@ -7,13 +7,14 @@ import { PDFViewer } from "../../shared/components/PDFViewer";
 import { PDFPagination } from "../../shared/components/PDFPagination";
 import { ParticipantsList } from "../../features/brainstorming/components/ParticipantsList";
 import { GroupChatSidebar } from "../../features/brainstorming/components/GroupChatSidebar";
-import { MOCK_STUDY_GROUPS } from "../../mock/brainstorming/mockData";
-import { MOCK_GROUP_WORKS } from "../../mock/brainstorming/groupWorksMockData";
-import {
-  MOCK_GROUP_PARTICIPANTS,
-  MOCK_GROUP_COMMENTS,
-  type Comment,
-} from "../../mock/brainstorming/groupChatMockData";
+type Comment = {
+  id: string;
+  author: string;
+  authorInitials: string;
+  content: string;
+  timestamp: string;
+  replies?: Comment[];
+};
 import previousArrowIcon from "../../shared/assets/previousArrowIcon.svg";
 
 export default function GroupStudyPage() {
@@ -24,10 +25,11 @@ export default function GroupStudyPage() {
   const [pageNumber, setPageNumber] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [comments, setComments] = useState<Comment[]>(MOCK_GROUP_COMMENTS);
-
-  const group = MOCK_STUDY_GROUPS.find((g) => g.id === groupId);
-  const works = groupId ? MOCK_GROUP_WORKS[groupId] || [] : [];
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [group, setGroup] = useState<any>(null);
+  const [works, setWorks] = useState<any[]>([]);
+  
+  // TODO: API 연동으로 group과 works 가져오기
   const work = works.find((w) => w.id === workId);
 
   if (!group || !work) {
@@ -136,7 +138,8 @@ export default function GroupStudyPage() {
               <p className="text-sm font-inter text-text-secondary mb-4">
                 Upload documents, annotate texts, and discuss with your study group in real-time.
               </p>
-              <ParticipantsList participants={MOCK_GROUP_PARTICIPANTS} activeCount={3} />
+              {/* TODO: API 연동으로 참가자 목록 가져오기 */}
+              <ParticipantsList participants={[]} activeCount={0} />
             </section>
 
             {work.pdfPath ? (

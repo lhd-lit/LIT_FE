@@ -6,8 +6,6 @@ import { SearchBar } from "../../shared/components/SearchBar";
 import { PDFViewer } from "../../shared/components/PDFViewer";
 import { PDFPagination } from "../../shared/components/PDFPagination";
 import { AILearningAssistant } from "../../features/focusing/components/AILearningAssistant";
-import { MOCK_FOCUSING_CARDS } from "../../mock/focusing/mockData";
-import { MOCK_MESSAGES } from "../../mock/focusing/aiAssistantMockData";
 import previousArrowIcon from "../../shared/assets/previousArrowIcon.svg";
 
 export default function StudyPage() {
@@ -19,9 +17,15 @@ export default function StudyPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const documentData = MOCK_FOCUSING_CARDS.find(({ card }) => card.id === documentId);
-  const docCard = documentData?.card;
-  const pdfPath = documentData?.pdfPath;
+  // TODO: API 연동으로 documentData 가져오기
+  const [docCard, setDocCard] = useState<any>(null);
+  const [pdfPath, setPdfPath] = useState<string | null>(null);
+
+  useEffect(() => {
+    // TODO: API 호출로 문서 정보 가져오기
+    setDocCard(null);
+    setPdfPath(null);
+  }, [documentId]);
 
   if (!docCard) {
     return (
@@ -31,8 +35,7 @@ export default function StudyPage() {
     );
   }
 
-  const handleSendMessage = (message: string) => {
-    console.log("Message sent:", message);
+  const handleSendMessage = (_message: string) => {
     // TODO: Implement AI message handling
   };
 
@@ -149,7 +152,7 @@ export default function StudyPage() {
 
       {isAssistantOpen ? (
         <AILearningAssistant
-          messages={MOCK_MESSAGES}
+          messages={[]}
           onSendMessage={handleSendMessage}
           onClose={() => setIsAssistantOpen(false)}
         />

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import searchIcon from "../../../shared/assets/searchIcon.svg";
-import { MOCK_MEMBERS } from "../../../mock/brainstorming/mockData";
 
 type CreateGroupModalProps = {
   open: boolean;
@@ -13,17 +12,12 @@ export function CreateGroupModal({ open, onClose }: CreateGroupModalProps) {
   const [description, setDescription] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredMembers = MOCK_MEMBERS.filter(
-    (member) =>
-      !searchQuery ||
-      member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      member.initials.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // TODO: API 연동으로 멤버 목록 가져오기
+  const filteredMembers: any[] = [];
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     // TODO: Hook up to API when available
-    console.log("Creating group:", { groupName, description });
     handleReset();
     onClose();
   };
