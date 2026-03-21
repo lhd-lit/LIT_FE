@@ -9,7 +9,8 @@ export function StorageUsageCard({ stats }: StorageUsageCardProps) {
   const percentUsed = Math.min(100, Math.round((stats.used / stats.total) * 100));
   const available = stats.total - stats.used;
 
-  const formatValue = (value: number) => `${value} ${stats.unit}`;
+  const formatValue = (value: number) =>
+    `${value.toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 0 })} ${stats.unit}`;
 
   return (
     <section className="

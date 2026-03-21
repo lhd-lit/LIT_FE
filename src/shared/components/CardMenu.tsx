@@ -61,7 +61,6 @@ export function CardMenu({ onAddToFavorites, onDelete }: CardMenuProps) {
   const menuContent = isOpen && (
     <div
       ref={menuRef}
-      data-menu-content
       className="fixed w-[180px] bg-white rounded-lg shadow-lg border border-border py-2 z-[100]"
       style={{
         top: `${menuPosition.top}px`,
@@ -105,7 +104,6 @@ export function CardMenu({ onAddToFavorites, onDelete }: CardMenuProps) {
         type="button"
         onClick={handleMenuToggle}
         onMouseDown={(e) => e.stopPropagation()}
-        data-menu-button
         className="text-text-primary hover:text-primary transition px-1 hover:bg-background rounded-md py-1 hover:scale-110"
         aria-label="More actions"
       >

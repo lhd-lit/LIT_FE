@@ -23,6 +23,8 @@ export type GroupWork = {
   description?: string;
   pdfPath?: string;
   members?: number;
+  comments?: number;
+  isPinned?: boolean;
 };
 
 

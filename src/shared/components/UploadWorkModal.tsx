@@ -34,6 +34,12 @@ export function UploadWorkModal({
 
   if (!open) return null;
 
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const file = fileInputRef.current?.files?.[0] ?? null;
@@ -71,7 +77,10 @@ export function UploadWorkModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      onClick={handleBackdropClick}
+    >
       <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
 
       <div
@@ -88,6 +97,10 @@ export function UploadWorkModal({
           py-5
           space-y-5
         "
+        onClick={(e) => {
+          // 모달 내부 클릭 시 이벤트 전파 방지 (모달이 닫히지 않도록)
+          e.stopPropagation();
+        }}
       >
         <header className="flex items-start justify-between">
           <div>

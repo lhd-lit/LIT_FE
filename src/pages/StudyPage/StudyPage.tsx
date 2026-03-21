@@ -6,84 +6,38 @@ import { SearchBar } from "../../shared/components/SearchBar";
 import { PDFViewer } from "../../shared/components/PDFViewer";
 import { PDFPagination } from "../../shared/components/PDFPagination";
 import { AILearningAssistant } from "../../features/focusing/components/AILearningAssistant";
+import { useSelfStudyFile } from "../../features/focusing/hooks/useSelfStudyFile";
+import { usePdfViewer } from "../../features/focusing/hooks/usePdfViewer";
+import { downloadFile } from "../../shared/utils/file.utils";
 import previousArrowIcon from "../../shared/assets/previousArrowIcon.svg";
 
 export default function StudyPage() {
   const { documentId } = useParams<{ documentId: string }>();
   const [isAssistantOpen, setIsAssistantOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [numPages, setNumPages] = useState<number | null>(null);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { fileUrl, loading: fileLoading, error: fileError } = useSelfStudyFile(documentId);
+  const pdfViewer = usePdfViewer();
 
-  // TODO: API 연동으로 documentData 가져오기
-  const [docCard, setDocCard] = useState<any>(null);
-  const [pdfPath, setPdfPath] = useState<string | null>(null);
-
+  // 파일 URL이 변경되면 PDF 뷰어 리셋
   useEffect(() => {
-    // TODO: API 호출로 문서 정보 가져오기
-    setDocCard(null);
-    setPdfPath(null);
-  }, [documentId]);
+    if (fileUrl) {
+      pdfViewer.reset();
+    }
+  }, [fileUrl, pdfViewer.reset]);
 
-  if (!docCard) {
-    return (
-      <div className="p-8">
-        <p>Document not found</p>
-      </div>
-    );
-  }
-
-  const handleSendMessage = (_message: string) => {
+  const handleSendMessage = (message: string) => {
+    console.log("Message sent:", message);
     // TODO: Implement AI message handling
   };
 
-  useEffect(() => {
-    // 문서가 바뀌면 페이지/상태 초기화
-    setPageNumber(1);
-    setNumPages(null);
-    setLoading(true);
-    setError(null);
-  }, [pdfPath, documentId]);
-
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
-    setLoading(false);
-    setError(null);
-  };
-
-  const onDocumentLoadError = (error: Error) => {
-    setError(error.message);
-    setLoading(false);
-  };
-
-
-  const goToPrevPage = () => {
-    setPageNumber((prev) => Math.max(1, prev - 1));
-  };
-
-  const goToNextPage = () => {
-    setPageNumber((prev) => (numPages ? Math.min(numPages, prev + 1) : prev));
-  };
-
-  const goToFirstPage = () => {
-    setPageNumber(1);
-  };
-
-  const goToLastPage = () => {
-    if (!numPages) return;
-    setPageNumber(numPages);
-  };
-
   const handleDownload = () => {
-    if (!pdfPath) return;
-    const a = window.document.createElement("a");
-    a.href = pdfPath;
-    a.download = `${docCard.title}.pdf`;
-    a.rel = "noreferrer";
-    a.click();
+    if (fileUrl) {
+      downloadFile(fileUrl, "document.pdf");
+    }
   };
+
+  const loading = fileLoading && !fileUrl;
+  const error = fileError || pdfViewer.error;
 
   return (
     <div className="relative flex h-[calc(100vh-4rem)] overflow-hidden">
@@ -91,12 +45,7 @@ export default function StudyPage() {
         <header className="h-16 w-full px-8 flex items-center justify-between border-b border-gray-200 bg-white">
           <div className="flex items-center gap-4">
             <BackButton to="/focusing" />
-            <div className="flex flex-col">
-              <h1 className="heading-primary text-sm">{docCard.title}</h1>
-              <h2 className="heading-primary text-lg">{docCard.author}</h2>
-            </div>
           </div>
-
           <div className="flex items-center gap-4">
             <SearchBar
               placeholder="학습내용 검색..."
@@ -109,43 +58,34 @@ export default function StudyPage() {
 
         <main className="flex-1 overflow-y-auto bg-background px-8 py-6">
           <div className="mx-auto bg-white rounded-2xl shadow-sm max-w-4xl p-8 border border-border">
-            {pdfPath ? (
+            {loading ? (
+              <div className="flex items-center justify-center h-[calc(100vh-12rem)] min-h-[800px]">
+                <p className="text-text-secondary">파일 로딩 중...</p>
+              </div>
+            ) : error ? (
+              <div className="flex items-center justify-center h-[calc(100vh-12rem)] min-h-[800px]">
+                <p className="text-red-600">{error}</p>
+              </div>
+            ) : fileUrl ? (
               <div className="flex flex-col items-center">
                 <PDFViewer
-                  file={pdfPath}
-                  pageNumber={pageNumber}
-                  onDocumentLoadSuccess={onDocumentLoadSuccess}
-                  onDocumentLoadError={onDocumentLoadError}
+                  file={fileUrl}
+                  pageNumber={pdfViewer.pageNumber}
+                  onDocumentLoadSuccess={pdfViewer.onDocumentLoadSuccess}
+                  onDocumentLoadError={pdfViewer.onDocumentLoadError}
                 />
-
-                {error && (
-                  <div className="mt-4 text-sm text-red-600">
-                    <p>PDF 로딩 오류: {error}</p>
-                  </div>
-                )}
-
                 <div className="mt-6">
                   <PDFPagination
-                    pageNumber={pageNumber}
-                    numPages={numPages}
-                    onFirstPage={goToFirstPage}
-                    onPrevPage={goToPrevPage}
-                    onNextPage={goToNextPage}
-                    onLastPage={goToLastPage}
+                    pageNumber={pdfViewer.pageNumber}
+                    numPages={pdfViewer.numPages}
+                    onFirstPage={pdfViewer.goToFirstPage}
+                    onPrevPage={pdfViewer.goToPrevPage}
+                    onNextPage={pdfViewer.goToNextPage}
+                    onLastPage={pdfViewer.goToLastPage}
                   />
                 </div>
-
-                {loading && (
-                  <div className="mt-3 text-xs text-text-secondary">
-                    <p>PDF 로딩 중...</p>
-                  </div>
-                )}
               </div>
-            ) : (
-              <div className="flex items-center justify-center h-[calc(100vh-12rem)] min-h-[800px] text-text-secondary">
-                <p>PDF 파일이 없습니다.</p>
-              </div>
-            )}
+            ) : null}
           </div>
         </main>
       </div>
@@ -170,4 +110,3 @@ export default function StudyPage() {
     </div>
   );
 }
-

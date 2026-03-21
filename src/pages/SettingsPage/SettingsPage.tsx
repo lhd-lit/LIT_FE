@@ -1,7 +1,8 @@
 import { useUserProfile } from '../../features/settings/hooks/useUserProfile';
+import { useStorageUsage } from '../../features/settings/hooks/useStorageUsage';
 import { ProfileCard } from '../../features/settings/components/ProfileCard';
 // import { TokenUsageCard } from '../../features/settings/components/TokenUsageCard';
-// import { StorageUsageCard } from '../../features/settings/components/StorageUsageCard';
+import { StorageUsageCard } from '../../features/settings/components/StorageUsageCard';
 import { DeleteAccountCard } from '../../features/settings/components/DeleteAccountCard';
 
 /**
@@ -10,6 +11,11 @@ import { DeleteAccountCard } from '../../features/settings/components/DeleteAcco
  */
 export default function SettingsPage() {
   const { user, loading, error } = useUserProfile();
+  const {
+    stats: storageStats,
+    loading: storageLoading,
+    error: storageError,
+  } = useStorageUsage();
 
   if (loading) {
     return (
@@ -59,9 +65,18 @@ export default function SettingsPage() {
 
       <div className="flex flex-col gap-4 max-w-4xl mx-auto w-full">
         <ProfileCard user={user} />
-        {/* TODO: API에서 사용 통계 정보 가져오기 */}
         {/* {tokenStats && <TokenUsageCard stats={tokenStats} />} */}
-        {/* {storageStats && <StorageUsageCard stats={storageStats} />} */}
+        {storageLoading && (
+          <div className="rounded-2xl border border-border bg-white p-6 text-center text-sm text-text-secondary font-inter">
+            Loading storage usage…
+          </div>
+        )}
+        {!storageLoading && storageError && (
+          <div className="rounded-2xl border border-border border-red-200 bg-red-50/50 p-6 text-center text-sm text-red-700 font-inter">
+            {storageError}
+          </div>
+        )}
+        {!storageLoading && storageStats && <StorageUsageCard stats={storageStats} />}
         <DeleteAccountCard />
       </div>
     </div>

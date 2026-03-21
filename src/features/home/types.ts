@@ -3,6 +3,8 @@ export type Card = {
   title: string;
   author: string;
   thumbnail: string;
+  /** ISO date from API (e.g. last viewed) */
+  lastViewedAt?: string | null;
 };
 
 export type FocusingCard = Card;

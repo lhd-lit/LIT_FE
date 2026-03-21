@@ -58,7 +58,7 @@ export function PageLayout({
 
   return (
     <>
-      <div className="flex flex-col">
+      <div className="flex flex-col relative">
         <div className="flex flex-col gap-4 pb-4 border-b border-border bg-white p-8">
           {backTo && (
             <div className="flex items-center">
@@ -84,7 +84,7 @@ export function PageLayout({
         {children}
       </div>
 
-      {enableUpload && (
+      {enableUpload && uploadOpen && (
         <UploadWorkModal
           open={uploadOpen}
           onClose={handleCloseModal}

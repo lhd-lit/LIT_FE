@@ -10,8 +10,12 @@ type GroupCardProps = {
 const MAX_VISIBLE_PARTICIPANTS = 5;
 
 export function GroupCard({ group }: GroupCardProps) {
-  const visibleParticipants = group.participants.slice(0, MAX_VISIBLE_PARTICIPANTS);
-  const extraCount = Math.max(0, group.participants.length - MAX_VISIBLE_PARTICIPANTS);
+  if (!group || !group.id) {
+    return null;
+  }
+
+  const visibleParticipants = (group.participants || []).slice(0, MAX_VISIBLE_PARTICIPANTS);
+  const extraCount = Math.max(0, (group.participants || []).length - MAX_VISIBLE_PARTICIPANTS);
 
   return (
     <Link

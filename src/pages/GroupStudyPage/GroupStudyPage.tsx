@@ -7,6 +7,12 @@ import { PDFViewer } from "../../shared/components/PDFViewer";
 import { PDFPagination } from "../../shared/components/PDFPagination";
 import { ParticipantsList } from "../../features/brainstorming/components/ParticipantsList";
 import { GroupChatSidebar } from "../../features/brainstorming/components/GroupChatSidebar";
+import { useStudyGroup } from "../../features/brainstorming/hooks/useStudyGroup";
+import { useGroupDocumentFile } from "../../features/brainstorming/hooks/useGroupDocumentFile";
+import { usePdfViewer } from "../../features/focusing/hooks/usePdfViewer";
+import { downloadFile } from "../../shared/utils/file.utils";
+import previousArrowIcon from "../../shared/assets/previousArrowIcon.svg";
+
 type Comment = {
   id: string;
   author: string;
@@ -15,75 +21,50 @@ type Comment = {
   timestamp: string;
   replies?: Comment[];
 };
-import previousArrowIcon from "../../shared/assets/previousArrowIcon.svg";
 
 export default function GroupStudyPage() {
   const { groupId, workId } = useParams<{ groupId: string; workId: string }>();
   const [isChatOpen, setIsChatOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [numPages, setNumPages] = useState<number | null>(null);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
-  const [group, setGroup] = useState<any>(null);
-  const [works, setWorks] = useState<any[]>([]);
   
-  // TODO: API 연동으로 group과 works 가져오기
-  const work = works.find((w) => w.id === workId);
+  const { group, works, loading: groupLoading, error: groupError } = useStudyGroup(groupId);
+  const { fileUrl, loading: fileLoading, error: fileError } = useGroupDocumentFile(groupId, workId);
+  const pdfViewer = usePdfViewer();
+  
+  const work = works.find((w) => w && w.id === workId);
 
-  if (!group || !work) {
+  // 파일 URL이 변경되면 PDF 뷰어 리셋
+  useEffect(() => {
+    if (fileUrl) {
+      pdfViewer.reset();
+    }
+  }, [fileUrl, pdfViewer.reset]);
+
+  if (groupLoading) {
     return (
       <div className="p-8">
-        <p>Group or work not found</p>
+        <p className="text-center text-text-secondary">로딩 중...</p>
       </div>
     );
   }
 
-  useEffect(() => {
-    setPageNumber(1);
-    setNumPages(null);
-    setLoading(true);
-    setError(null);
-  }, [workId]);
-
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
-    setLoading(false);
-    setError(null);
-  };
-
-  const onDocumentLoadError = (error: Error) => {
-    setError(error.message);
-    setLoading(false);
-  };
-
-
-  const goToPrevPage = () => {
-    setPageNumber((prev) => Math.max(1, prev - 1));
-  };
-
-  const goToNextPage = () => {
-    setPageNumber((prev) => (numPages ? Math.min(numPages, prev + 1) : prev));
-  };
-
-  const goToFirstPage = () => {
-    setPageNumber(1);
-  };
-
-  const goToLastPage = () => {
-    if (!numPages) return;
-    setPageNumber(numPages);
-  };
+  if (groupError || !group || !work || !work.id) {
+    return (
+      <div className="p-8">
+        <p className="text-center text-red-600">{groupError || "그룹 또는 문서를 찾을 수 없습니다."}</p>
+      </div>
+    );
+  }
 
   const handleDownload = () => {
-    if (!work.pdfPath) return;
-    const a = window.document.createElement("a");
-    a.href = work.pdfPath;
-    a.download = `${work.title}.pdf`;
-    a.rel = "noreferrer";
-    a.click();
+    if (fileUrl && work.title) {
+      downloadFile(fileUrl, `${work.title}.pdf`);
+    }
   };
+
+  const loading = fileLoading && !fileUrl;
+  const error = fileError || pdfViewer.error;
 
   const handleSendComment = (content: string) => {
     const newComment: Comment = {
@@ -120,8 +101,8 @@ export default function GroupStudyPage() {
           <div className="flex items-center gap-4">
             <BackButton to={`/brainstorming/group/${groupId}`} />
             <div className="flex flex-col">
-              <h1 className="heading-primary text-sm">{work.title}</h1>
-              <h2 className="heading-primary text-lg">{work.author}</h2>
+              <h1 className="heading-primary text-sm">{work?.title || '문서'}</h1>
+              <h2 className="heading-primary text-lg">{work?.author || '작성자 없음'}</h2>
             </div>
           </div>
 
@@ -142,38 +123,34 @@ export default function GroupStudyPage() {
               <ParticipantsList participants={[]} activeCount={0} />
             </section>
 
-            {work.pdfPath ? (
+            {loading ? (
+              <div className="flex items-center justify-center h-[600px] text-text-secondary">
+                <p>파일 로딩 중...</p>
+              </div>
+            ) : error ? (
+              <div className="flex items-center justify-center h-[600px] text-red-600">
+                <p>{error}</p>
+              </div>
+            ) : fileUrl ? (
               <div className={`bg-white rounded-2xl shadow-sm p-6 mx-auto border border-border ${isChatOpen ? "max-w-5xl" : "max-w-6xl"}`}>
                 <div className="flex flex-col items-center w-full">
                   <PDFViewer
-                    file={work.pdfPath}
-                    pageNumber={pageNumber}
-                    onDocumentLoadSuccess={onDocumentLoadSuccess}
-                    onDocumentLoadError={onDocumentLoadError}
+                    file={fileUrl}
+                    pageNumber={pdfViewer.pageNumber}
+                    onDocumentLoadSuccess={pdfViewer.onDocumentLoadSuccess}
+                    onDocumentLoadError={pdfViewer.onDocumentLoadError}
                   />
-
-                  {error && (
-                    <div className="mt-4 text-sm text-red-600">
-                      <p>PDF 로딩 오류: {error}</p>
-                    </div>
-                  )}
 
                   <div className="mt-6">
                     <PDFPagination
-                      pageNumber={pageNumber}
-                      numPages={numPages}
-                      onFirstPage={goToFirstPage}
-                      onPrevPage={goToPrevPage}
-                      onNextPage={goToNextPage}
-                      onLastPage={goToLastPage}
+                      pageNumber={pdfViewer.pageNumber}
+                      numPages={pdfViewer.numPages}
+                      onFirstPage={pdfViewer.goToFirstPage}
+                      onPrevPage={pdfViewer.goToPrevPage}
+                      onNextPage={pdfViewer.goToNextPage}
+                      onLastPage={pdfViewer.goToLastPage}
                     />
                   </div>
-
-                  {loading && (
-                    <div className="mt-3 text-xs text-text-secondary">
-                      <p>PDF 로딩 중...</p>
-                    </div>
-                  )}
                 </div>
               </div>
             ) : (

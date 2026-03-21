@@ -45,7 +45,7 @@ export function AILearningAssistant({
       </div>
 
       <div className="flex-1 px-6 py-6 space-y-4 overflow-y-auto">
-        {messages.length === 0 ? (
+        {!messages || messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-center">
             <div className="text-text-tertiary">
               <p className="font-inter text-sm">Start a conversation with AI</p>

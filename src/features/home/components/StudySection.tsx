@@ -11,6 +11,12 @@ type StudySectionProps = {
   recentCard: Card | null;
   bookmarkedCards: Card[];
   actionLabel: string;
+  /** 최근 항목 API 로딩 */
+  recentLoading?: boolean;
+  /** 최근 항목 API 오류 메시지 */
+  recentError?: string | null;
+  /** Recent 카드 CTA → 해당 학습/그룹 화면으로 이동 */
+  recentContinuePath?: (card: Card) => string;
   renderRecentMetaData?: (card: BrainStormingCard) => ReactNode;
   renderBookmarkedMetaData?: (card: BrainStormingCard) => ReactNode;
 };
@@ -22,6 +28,9 @@ export function StudySection({
   recentCard,
   bookmarkedCards,
   actionLabel,
+  recentLoading,
+  recentError,
+  recentContinuePath,
   renderRecentMetaData,
   renderBookmarkedMetaData,
 }: StudySectionProps) {
@@ -33,6 +42,9 @@ export function StudySection({
         title={title}
         card={recentCard}
         actionLabel={actionLabel}
+        loading={recentLoading}
+        error={recentError}
+        recentContinuePath={recentContinuePath}
         renderRecentMetaData={renderRecentMetaData}
       />
 

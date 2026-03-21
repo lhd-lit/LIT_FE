@@ -10,12 +10,12 @@ type BookmarkedSectionProps = {
 
 }
 
-export function BookmarkedSection( {title, cards, renderBookmarkedMetaData} : BookmarkedSectionProps ){
+export function BookmarkedSection({ title, cards, renderBookmarkedMetaData }: BookmarkedSectionProps) {
+    // null이나 undefined 항목 필터링
+    const validCards = (cards || []).filter((card) => card != null && card.id != null);
 
-    return(
-
+    return (
         <div className="w-full p-6">
-
             <h3 className="
                 font-playfair
                 text-lg
@@ -26,26 +26,25 @@ export function BookmarkedSection( {title, cards, renderBookmarkedMetaData} : Bo
                 Favorite {title}
             </h3>
 
-            <div className="
-                grid 
-                grid-cols-1
-                md:grid-cols-3
-                lg:grid-cols-4
-                gap-4
+            {validCards.length === 0 ? (
+                <div className="text-sm text-text-secondary font-inter">
+                    북마크한 항목이 없습니다.
+                </div>
+            ) : (
+                <div className="
+                    grid 
+                    grid-cols-1
+                    md:grid-cols-3
+                    lg:grid-cols-4
+                    gap-4
                 ">
-
-                {cards.map((card) => (
-
-                    <StudyCard key={card.id} card={card} variant="grid">
-                        {renderBookmarkedMetaData?.(card as BrainStormingCard)}
-                    </StudyCard>
-                ))}
-
-            </div>
-
-
+                    {validCards.map((card) => (
+                        <StudyCard key={card.id} card={card} variant="grid">
+                            {renderBookmarkedMetaData?.(card as BrainStormingCard)}
+                        </StudyCard>
+                    ))}
+                </div>
+            )}
         </div>
-
-    )
-
+    );
 }
