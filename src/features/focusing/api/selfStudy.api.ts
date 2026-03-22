@@ -28,10 +28,15 @@ export const createSelfStudy = async (
   file?: File
 ): Promise<CreateSelfStudyResponse> => {
   const formData = new FormData();
-  formData.append('title', title);
-  if (description) {
-    formData.append('description', description);
-  }
+  // Spring @RequestPart("request") — 그룹 문서 업로드(addGroupDocument)와 동일한 멀티파트 형식
+  const requestPayload = JSON.stringify({
+    title,
+    description: description ?? '',
+  });
+  formData.append(
+    'request',
+    new Blob([requestPayload], { type: 'application/json' })
+  );
   if (file) {
     formData.append('file', file);
   }
@@ -51,4 +56,11 @@ export const getSelfStudyFile = async (selfStudyId: number | string): Promise<st
     `/api/selfStudy/${selfStudyId}/file`
   );
   return response.data.result.presignedUrl;
+};
+
+/**
+ * SelfStudy 삭제
+ */
+export const deleteSelfStudy = async (selfStudyId: number | string): Promise<void> => {
+  await apiClient.delete(`/api/selfStudy/${selfStudyId}`);
 };

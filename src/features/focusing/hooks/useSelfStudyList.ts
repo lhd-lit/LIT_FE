@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getMySelfStudyList } from '../api/selfStudy.api';
 import { convertSelfStudyListToCards } from '../utils/selfStudy.utils';
 import type { Card } from '../../../features/home/types';
@@ -8,12 +8,18 @@ interface UseSelfStudyListReturn {
   cards: Array<{ card: Card; metadata?: CardMetadata }>;
   loading: boolean;
   error: string | null;
+  refetch: () => void;
 }
 
 export const useSelfStudyList = (): UseSelfStudyListReturn => {
   const [cards, setCards] = useState<Array<{ card: Card; metadata?: CardMetadata }>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  const refetch = useCallback(() => {
+    setReloadKey((k) => k + 1);
+  }, []);
 
   useEffect(() => {
     const fetchSelfStudyList = async () => {
@@ -47,8 +53,8 @@ export const useSelfStudyList = (): UseSelfStudyListReturn => {
     };
 
     fetchSelfStudyList();
-  }, []);
+  }, [reloadKey]);
 
-  return { cards, loading, error };
+  return { cards, loading, error, refetch };
 };
 
