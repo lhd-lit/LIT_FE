@@ -1,15 +1,23 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { PageLayout } from "../../shared/components/PageLayout";
 import brainstormingIcon from "../../shared/assets/brainstormingIcon.svg";
 import { CreateGroupButton } from "../../features/brainstorming/components/CreateGroupButton";
 import { CreateGroupModal } from "../../features/brainstorming/components/CreateGroupModal";
 import { GroupCard } from "../../features/brainstorming/components/GroupCard";
 import { useGroupsList } from "../../features/brainstorming/hooks/useGroupsList";
+import { isStudyGroupBookmarked } from "../../features/brainstorming/utils/studyGroupBookmarks.utils";
+import type { StudyGroup } from "../../features/brainstorming/types";
+
+const CARD_GRID =
+  "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6";
 
 export default function BrainStormingPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const { groups, loading, error } = useGroupsList();
+  const [bookmarkTick, setBookmarkTick] = useState(0);
+  const { groups, loading, error, refetch } = useGroupsList();
+
+  const bumpBookmarks = useCallback(() => setBookmarkTick((t) => t + 1), []);
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -30,6 +38,17 @@ export default function BrainStormingPage() {
         group.description?.toLowerCase().includes(query))
     );
   }, [groups, searchQuery]);
+
+  const { favoriteGroups, otherGroups } = useMemo(() => {
+    const fav: StudyGroup[] = [];
+    const rest: StudyGroup[] = [];
+    for (const g of filteredGroups) {
+      if (!g?.id) continue;
+      if (isStudyGroupBookmarked(g.id)) fav.push(g);
+      else rest.push(g);
+    }
+    return { favoriteGroups: fav, otherGroups: rest };
+  }, [filteredGroups, bookmarkTick]);
 
   return (
     <>
@@ -58,11 +77,45 @@ export default function BrainStormingPage() {
                 {searchQuery ? "검색 결과가 없습니다." : "스터디 그룹이 없습니다."}
               </p>
             </div>
+          ) : favoriteGroups.length > 0 ? (
+            <div className="flex flex-col gap-6 sm:gap-8">
+              <div className={CARD_GRID}>
+                {favoriteGroups.map((group) =>
+                  group?.id ? (
+                    <GroupCard
+                      key={group.id}
+                      group={group}
+                      onLeaveSuccess={refetch}
+                      onFavoriteChange={bumpBookmarks}
+                    />
+                  ) : null
+                )}
+              </div>
+              {otherGroups.length > 0 && (
+                <div className={CARD_GRID}>
+                  {otherGroups.map((group) =>
+                    group?.id ? (
+                      <GroupCard
+                        key={group.id}
+                        group={group}
+                        onLeaveSuccess={refetch}
+                        onFavoriteChange={bumpBookmarks}
+                      />
+                    ) : null
+                  )}
+                </div>
+              )}
+            </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-              {filteredGroups.map((group) => 
-                group && group.id ? (
-                  <GroupCard key={group.id} group={group} />
+            <div className={CARD_GRID}>
+              {filteredGroups.map((group) =>
+                group?.id ? (
+                  <GroupCard
+                    key={group.id}
+                    group={group}
+                    onLeaveSuccess={refetch}
+                    onFavoriteChange={bumpBookmarks}
+                  />
                 ) : null
               )}
             </div>
