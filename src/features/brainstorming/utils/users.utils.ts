@@ -1,5 +1,5 @@
 import type { Member } from '../types';
-import type { UserSearchResponse } from '../api/users.api';
+import type { UserSearchResponse } from '../api/users.dto';
 
 /**
  * 이름에서 이니셜 추출

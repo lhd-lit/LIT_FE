@@ -1,5 +1,5 @@
 import type { GroupWork } from '../types';
-import type { GroupDocumentResponse } from '../api/groups.api';
+import type { GroupDocumentResponse } from '../api/groups.dto';
 
 /**
  * GroupDocumentResponse를 GroupWork 타입으로 변환

@@ -1,5 +1,5 @@
 import type { StudyGroup } from '../types';
-import type { StudyGroupResponse } from '../api/groups.api';
+import type { StudyGroupResponse } from '../api/groups.dto';
 
 /**
  * StudyGroupResponse를 StudyGroup 타입으로 변환

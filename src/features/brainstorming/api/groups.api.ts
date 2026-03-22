@@ -1,50 +1,24 @@
 import apiClient from '../../../api/client';
 import type { GlobalResponse } from '../../focusing/types';
+import type {
+  AddGroupDocumentResponse,
+  CreateGroupResponse,
+  GroupDocumentListResponse,
+  GroupFileResponse,
+  StudyGroupListResponse,
+} from './groups.dto';
 
-/**
- * 스터디 그룹 응답 타입
- */
-export interface StudyGroupResponse {
-  studyGroupId: number;
-  name: string;
-  description: string;
-  ownerName: string;
-  memberCount: number;
-  lastViewedAt: string;
-}
-
-/**
- * 스터디 그룹 목록 응답 타입 (페이지네이션)
- */
-export interface StudyGroupListResponse {
-  content: StudyGroupResponse[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-}
-
-/**
- * 그룹 문서 응답 타입
- */
-export interface GroupDocumentResponse {
-  groupDocumentId: number;
-  selfStudyId: number;
-  title: string;
-  description: string;
-  uploaderName: string;
-}
-
-/**
- * 그룹 문서 목록 응답 타입 (페이지네이션)
- */
-export interface GroupDocumentListResponse {
-  content: GroupDocumentResponse[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-}
+export type {
+  AddGroupDocumentRequest,
+  AddGroupDocumentResponse,
+  CreateGroupRequest,
+  CreateGroupResponse,
+  GroupDocumentListResponse,
+  GroupDocumentResponse,
+  GroupFileResponse,
+  StudyGroupListResponse,
+  StudyGroupResponse,
+} from './groups.dto';
 
 /**
  * 내 스터디 그룹 목록 조회
@@ -58,18 +32,6 @@ export const getMyGroups = async (
   });
   return response.data.result;
 };
-
-/**
- * 스터디 그룹 단건 조회
- * 주의: 백엔드에서 GET /api/groups/{groupId}가 주석 처리되어 있어서 사용하지 않음
- * 대신 getMyGroups로 목록을 가져와서 찾아야 함
- */
-// export const getGroup = async (groupId: number | string): Promise<StudyGroupResponse> => {
-//   const response = await apiClient.get<GlobalResponse<StudyGroupResponse>>(
-//     `/api/groups/${groupId}`
-//   );
-//   return response.data.result;
-// };
 
 /**
  * 그룹 문서 목록 조회
@@ -89,24 +51,6 @@ export const getGroupDocuments = async (
 };
 
 /**
- * 그룹 생성 요청 타입
- */
-export interface CreateGroupRequest {
-  name: string;
-  description?: string;
-}
-
-/**
- * 그룹 생성 응답 타입
- */
-export interface CreateGroupResponse {
-  id: number;
-  name: string;
-  description: string;
-  ownerName: string;
-}
-
-/**
  * 스터디 그룹 생성
  */
 export const createGroup = async (
@@ -119,23 +63,6 @@ export const createGroup = async (
   });
   return response.data.result;
 };
-
-/**
- * 그룹 문서 추가 요청 타입
- */
-export interface AddGroupDocumentRequest {
-  title: string;
-  description?: string;
-}
-
-/**
- * 그룹 문서 추가 응답 타입
- */
-export interface AddGroupDocumentResponse {
-  groupDocumentId: number;
-  title: string;
-  uploaderName: string;
-}
 
 /**
  * 그룹에 문서 추가
@@ -158,15 +85,6 @@ export const addGroupDocument = async (
 };
 
 /**
- * 그룹 문서 파일 응답 타입
- */
-export interface GroupFileResponse {
-  title: string;
-  description: string;
-  presignedUrl: string;
-}
-
-/**
  * 그룹 문서 파일 Presigned URL 가져오기
  */
 export const getGroupDocumentFile = async (
@@ -177,4 +95,21 @@ export const getGroupDocumentFile = async (
     `/api/groups/${groupId}/documents/${groupDocumentId}/file`
   );
   return response.data.result.presignedUrl;
+};
+
+/**
+ * 그룹 학습 문서 삭제
+ */
+export const deleteGroupDocument = async (
+  groupId: number | string,
+  groupDocumentId: number | string
+): Promise<void> => {
+  await apiClient.delete(`/api/groups/${groupId}/documents/${groupDocumentId}`);
+};
+
+/**
+ * 스터디 그룹 탈퇴 (본인만, 방장 불가) — DELETE /api/groups/{groupId}/members/me
+ */
+export const leaveGroup = async (groupId: number | string): Promise<void> => {
+  await apiClient.delete(`/api/groups/${groupId}/members/me`);
 };

@@ -1,15 +1,8 @@
 import apiClient from '../../../api/client';
 import type { GlobalResponse } from '../../focusing/types';
+import type { UserSearchResponse } from './users.dto';
 
-/**
- * 사용자 검색 응답 타입
- */
-export interface UserSearchResponse {
-  userId: number;
-  name: string;
-  email: string;
-  alreadySelected: boolean;
-}
+export type { UserSearchResponse } from './users.dto';
 
 /**
  * 사용자 검색
@@ -24,7 +17,7 @@ export const searchUsers = async (
     return null;
   }
 
-  const params: Record<string, any> = { email };
+  const params: Record<string, unknown> = { email };
   if (excludeUserIds && excludeUserIds.length > 0) {
     params.excludeUserIds = excludeUserIds;
   }
@@ -34,6 +27,3 @@ export const searchUsers = async (
   });
   return response.data.result;
 };
-
-
-
