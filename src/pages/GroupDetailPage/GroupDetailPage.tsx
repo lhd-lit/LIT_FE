@@ -2,17 +2,25 @@ import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { PageLayout } from "../../shared/components/PageLayout";
 import { StudyCard } from "../../shared/components/StudyCard";
+import { GroupWorkCardMenu } from "../../features/brainstorming/components/GroupWorkCardMenu";
 import { CardMetaData } from "../../features/home/components/CardMetaData";
 import brainstormingIcon from "../../shared/assets/brainstormingIcon.svg";
 import pinnedIcon from "../../shared/assets/pinnedIcon.svg";
 import { useStudyGroup } from "../../features/brainstorming/hooks/useStudyGroup";
 import { useAddGroupDocument } from "../../features/brainstorming/hooks/useAddGroupDocument";
+import { deleteGroupDocument } from "../../features/brainstorming/api/groups.api";
+import {
+  isGroupDocumentBookmarked,
+  toggleGroupDocumentBookmark,
+} from "../../features/brainstorming/utils/groupDocumentBookmarks";
+import { getApiErrorMessage } from "../../shared/utils/apiError";
 import type { GroupWork } from "../../features/brainstorming/types";
 import type { Card } from "../../features/home/types";
 
 export default function GroupDetailPage() {
   const { groupId } = useParams<{ groupId: string }>();
   const [searchQuery, setSearchQuery] = useState("");
+  const [, setBookmarkTick] = useState(0);
   const navigate = useNavigate();
   const { group, works, loading, error, refetch } = useStudyGroup(groupId);
   const { handleAddDocument, loading: uploadLoading, error: uploadError } = useAddGroupDocument(
@@ -39,6 +47,25 @@ export default function GroupDetailPage() {
   const handleWorkClick = (workId: string) => {
     navigate(`/brainstorming/group/${groupId}/work/${workId}`);
   };
+
+  const handleDeleteWork = async (workId: string) => {
+    if (!groupId) return;
+    try {
+      await deleteGroupDocument(groupId, workId);
+      refetch();
+    } catch (e) {
+      alert(getApiErrorMessage(e, "작품 삭제에 실패했습니다."));
+    }
+  };
+
+  const handleToggleWorkBookmark = (workId: string) => {
+    if (!groupId) return;
+    toggleGroupDocumentBookmark(groupId, workId);
+    setBookmarkTick((t) => t + 1);
+  };
+
+  const workIsBookmarked = (workId: string) =>
+    groupId ? isGroupDocumentBookmarked(groupId, workId) : false;
 
   const filteredWorks = useMemo(() => {
     if (!works || works.length === 0) return [];
@@ -113,13 +140,24 @@ export default function GroupDetailPage() {
               {pinned.map((work) => 
                 work && work.id ? (
                   <div key={work.id} className="relative cursor-pointer" onClick={() => handleWorkClick(work.id)}>
-                    <StudyCard card={convertWorkToCard(work)} variant="grid">
+                    <StudyCard
+                      card={convertWorkToCard(work)}
+                      variant="grid"
+                      isFavorite={workIsBookmarked(work.id)}
+                      gridMenu={
+                        <GroupWorkCardMenu
+                          isFavorite={workIsBookmarked(work.id)}
+                          onToggleFavorite={() => handleToggleWorkBookmark(work.id)}
+                          onDelete={() => void handleDeleteWork(work.id)}
+                        />
+                      }
+                    >
                       <CardMetaData 
                         members={work.members || 0} 
                         comments={work.comments || 0} 
                       />
                     </StudyCard>
-                    <div className="absolute top-4 right-4">
+                    <div className="absolute top-4 left-4 pointer-events-none">
                       <img src={pinnedIcon} alt="pinned" className="w-10 h-10" />
                     </div>
                   </div>
@@ -136,7 +174,18 @@ export default function GroupDetailPage() {
               {unpinned.map((work) => 
                 work && work.id ? (
                   <div key={work.id} className="cursor-pointer" onClick={() => handleWorkClick(work.id)}>
-                    <StudyCard card={convertWorkToCard(work)} variant="grid">
+                    <StudyCard
+                      card={convertWorkToCard(work)}
+                      variant="grid"
+                      isFavorite={workIsBookmarked(work.id)}
+                      gridMenu={
+                        <GroupWorkCardMenu
+                          isFavorite={workIsBookmarked(work.id)}
+                          onToggleFavorite={() => handleToggleWorkBookmark(work.id)}
+                          onDelete={() => void handleDeleteWork(work.id)}
+                        />
+                      }
+                    >
                       <CardMetaData 
                         members={work.members || 0} 
                         comments={work.comments || 0} 

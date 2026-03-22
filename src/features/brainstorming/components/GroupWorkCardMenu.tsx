@@ -1,18 +1,34 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import cardMenuDeleteIcon from "../assets/cardMenuDeleteIcon.svg";
-import cardMenuFavoritesIcon from "../assets/cardMenuFavoritesIcon.svg";
+import cardMenuDeleteIcon from "../../../shared/assets/cardMenuDeleteIcon.svg";
+import cardMenuFavoritesIcon from "../../../shared/assets/cardMenuFavoritesIcon.svg";
 
-type CardMenuProps = {
-  onAddToFavorites: () => void;
+/**
+ * 스터디 그룹 작품(Group work) 카드 전용 ⋮ 메뉴.
+ * SelfStudyWorkCardMenu와 UI 패턴은 비슷하되 파일·도메인 분리 (공용 컴포넌트 아님).
+ * 즐겨찾기는 백엔드 API 없이 localStorage(`groupDocumentBookmarks`) 사용.
+ */
+type GroupWorkCardMenuProps = {
+  onToggleFavorite: () => void;
+  isFavorite: boolean;
+  favoritesLabel?: string;
   onDelete: () => void;
 };
 
-export function CardMenu({ onAddToFavorites, onDelete }: CardMenuProps) {
+export function GroupWorkCardMenu({
+  onToggleFavorite,
+  isFavorite,
+  favoritesLabel,
+  onDelete,
+}: GroupWorkCardMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, right: 0 });
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const label =
+    favoritesLabel ??
+    (isFavorite ? "Remove from Favorites" : "Add to Favorites");
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -28,7 +44,6 @@ export function CardMenu({ onAddToFavorites, onDelete }: CardMenuProps) {
 
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
-      // 메뉴 위치 계산
       if (buttonRef.current) {
         const rect = buttonRef.current.getBoundingClientRect();
         setMenuPosition({
@@ -48,8 +63,8 @@ export function CardMenu({ onAddToFavorites, onDelete }: CardMenuProps) {
     setIsOpen(!isOpen);
   };
 
-  const handleAddToFavorites = () => {
-    onAddToFavorites();
+  const handleFavorite = () => {
+    onToggleFavorite();
     setIsOpen(false);
   };
 
@@ -61,7 +76,7 @@ export function CardMenu({ onAddToFavorites, onDelete }: CardMenuProps) {
   const menuContent = isOpen && (
     <div
       ref={menuRef}
-      className="fixed w-[180px] bg-white rounded-lg shadow-lg border border-border py-2 z-[100]"
+      className="fixed w-[210px] bg-white rounded-lg shadow-lg border border-border py-2 z-[100]"
       style={{
         top: `${menuPosition.top}px`,
         right: `${menuPosition.right}px`,
@@ -73,12 +88,14 @@ export function CardMenu({ onAddToFavorites, onDelete }: CardMenuProps) {
         type="button"
         onClick={(e) => {
           e.stopPropagation();
-          handleAddToFavorites();
+          handleFavorite();
         }}
-        className="w-full flex items-center gap-3 px-4 py-2 hover:bg-background transition text-left"
+        className="w-full flex items-center gap-2 px-3 py-2 hover:bg-background transition text-left"
       >
-        <img src={cardMenuFavoritesIcon} alt="add to favorites icon" className="w-5 h-5" aria-hidden="true" />
-        <span className="text-sm font-inter text-text-primary">Add to Favorites</span>
+        <img src={cardMenuFavoritesIcon} alt="" className="w-4 h-4 shrink-0" aria-hidden="true" />
+        <span className="text-xs font-inter text-text-primary leading-tight whitespace-nowrap">
+          {label}
+        </span>
       </button>
 
       <div className="border-t border-border my-1" />
@@ -89,10 +106,10 @@ export function CardMenu({ onAddToFavorites, onDelete }: CardMenuProps) {
           e.stopPropagation();
           handleDelete();
         }}
-        className="w-full flex items-center gap-3 px-4 py-2 hover:bg-background transition text-left"
+        className="w-full flex items-center gap-2 px-3 py-2 hover:bg-background transition text-left"
       >
-        <img src={cardMenuDeleteIcon} alt="delete icon" className="w-5 h-5" aria-hidden="true" />
-        <span className="text-sm font-inter text-red-600 whitespace-nowrap">Delete Document</span>
+        <img src={cardMenuDeleteIcon} alt="" className="w-4 h-4 shrink-0" aria-hidden="true" />
+        <span className="text-xs font-inter text-red-600 whitespace-nowrap">Delete Document</span>
       </button>
     </div>
   );
@@ -105,7 +122,7 @@ export function CardMenu({ onAddToFavorites, onDelete }: CardMenuProps) {
         onClick={handleMenuToggle}
         onMouseDown={(e) => e.stopPropagation()}
         className="text-text-primary hover:text-primary transition px-1 hover:bg-background rounded-md py-1 hover:scale-110"
-        aria-label="More actions"
+        aria-label="Group work actions"
       >
         ⋮
       </button>
@@ -113,5 +130,3 @@ export function CardMenu({ onAddToFavorites, onDelete }: CardMenuProps) {
     </>
   );
 }
-
-

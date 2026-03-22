@@ -1,93 +1,131 @@
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import membersIcon from "../../../shared/assets/membersIcon.svg";
 import workingIcon from "../../../shared/assets/workingIcon.svg";
+import pinnedIcon from "../../../shared/assets/pinnedIcon.svg";
 import type { StudyGroup } from "../types";
+import {
+  isStudyGroupBookmarked,
+  toggleStudyGroupBookmark,
+} from "../utils/studyGroupBookmarks.utils";
+import { GroupCardMenu } from "./GroupCardMenu";
 
 type GroupCardProps = {
   group: StudyGroup;
+  onLeaveSuccess?: () => void;
+  /** 즐겨찾기 토글 시 목록 재분할용 */
+  onFavoriteChange?: () => void;
 };
 
 const MAX_VISIBLE_PARTICIPANTS = 5;
 
-export function GroupCard({ group }: GroupCardProps) {
+export function GroupCard({ group, onLeaveSuccess, onFavoriteChange }: GroupCardProps) {
+  const navigate = useNavigate();
+  const [favorite, setFavorite] = useState(() => isStudyGroupBookmarked(group.id));
+
+  useEffect(() => {
+    setFavorite(isStudyGroupBookmarked(group.id));
+  }, [group.id]);
+
   if (!group || !group.id) {
     return null;
   }
 
+  const handleToggleFavorite = () => {
+    const next = toggleStudyGroupBookmark(group.id);
+    setFavorite(next);
+    onFavoriteChange?.();
+  };
+
   const visibleParticipants = (group.participants || []).slice(0, MAX_VISIBLE_PARTICIPANTS);
   const extraCount = Math.max(0, (group.participants || []).length - MAX_VISIBLE_PARTICIPANTS);
 
+  const goToGroup = () => {
+    navigate(`/brainstorming/group/${group.id}`);
+  };
+
   return (
-    <Link
-      to={`/brainstorming/group/${group.id}`}
-      className="block bg-white border border-border rounded-2xl shadow-sm p-5 flex flex-col gap-4 hover:shadow-md transition"
-    >
-      <header className="flex items-start justify-between gap-2">
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-3">
-            <h3 className="heading-primary text-lg">{group.title}</h3>
-            {group.newCount !== undefined && group.newCount > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-primary text-white text-xs px-3 py-1 font-inter">
-                {group.newCount} new
+    <>
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={goToGroup}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            goToGroup();
+          }
+        }}
+        className="relative block bg-white border border-border rounded-2xl shadow-sm p-5 flex flex-col gap-4 hover:shadow-md transition cursor-pointer text-left w-full"
+      >
+        {favorite && (
+          <div className="absolute top-4 left-4 z-10 pointer-events-none" aria-hidden>
+            <img src={pinnedIcon} alt="" className="w-9 h-9" />
+          </div>
+        )}
+        <header className="flex items-start justify-between gap-2">
+          <div className="flex flex-col gap-2 min-w-0 flex-1">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h3 className="heading-primary text-lg">{group.title}</h3>
+              {group.newCount !== undefined && group.newCount > 0 && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary text-white text-xs px-3 py-1 font-inter">
+                  {group.newCount} new
+                </span>
+              )}
+            </div>
+            <p className="font-inter text-sm text-text-secondary">{group.description}</p>
+          </div>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            className="shrink-0"
+          >
+            <GroupCardMenu
+              group={group}
+              onLeaveSuccess={onLeaveSuccess}
+              isFavorite={favorite}
+              onToggleFavorite={handleToggleFavorite}
+            />
+          </div>
+        </header>
+
+        <div className="flex flex-wrap items-center gap-6 text-sm text-text-primary font-inter pointer-events-none">
+          <div className="flex items-center gap-2">
+            <img src={membersIcon} alt="" />
+            <span>{group.members} members</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <img src={workingIcon} alt="" />
+            <span>{group.works} works</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="inline-block h-2 w-2 rounded-full bg-primary" aria-hidden="true" />
+            <span>{group.updatedAgo}</span>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-4 pointer-events-none">
+          <div className="flex items-center">
+            {visibleParticipants.map((initials, index) => (
+              <span
+                key={`${initials}-${index}`}
+                className={`h-8 w-8 rounded-full bg-primary border-2 border-white text-white flex items-center justify-center text-xs font-inter ${
+                  index > 0 ? "-ml-2" : ""
+                }`}
+              >
+                {initials}
+              </span>
+            ))}
+            {extraCount > 0 && (
+              <span className="h-8 w-8 rounded-full bg-background-card text-text-primary flex items-center justify-center text-xs font-inter -ml-1">
+                +{extraCount}
               </span>
             )}
           </div>
-          <p className="font-inter text-sm text-text-secondary">{group.description}</p>
-        </div>
-        <button
-          type="button"
-          aria-label="More actions"
-          className="text-text-primary hover:text-primary transition px-1 hover:bg-background rounded-md py-1 hover:scale-110"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            // TODO: Implement menu functionality
-          }}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-        >
-          ⋮
-        </button>
-      </header>
 
-      <div className="flex flex-wrap items-center gap-6 text-sm text-text-primary font-inter">
-        <div className="flex items-center gap-2">
-          <img src={membersIcon} alt="members" />
-          <span>{group.members} members</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <img src={workingIcon} alt="works" />
-          <span>{group.works} works</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="inline-block h-2 w-2 rounded-full bg-primary" aria-hidden="true" />
-          <span>{group.updatedAgo}</span>
+          <p className="font-inter text-xs text-text-secondary">Created by {group.owner}</p>
         </div>
       </div>
-
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center">
-          {visibleParticipants.map((initials, index) => (
-            <span
-              key={`${initials}-${index}`}
-              className={`h-8 w-8 rounded-full bg-primary border-2 border-white text-white flex items-center justify-center text-xs font-inter ${
-                index > 0 ? "-ml-2" : ""
-              }`}
-            >
-              {initials}
-            </span>
-          ))}
-          {extraCount > 0 && (
-            <span className="h-8 w-8 rounded-full bg-background-card text-text-primary flex items-center justify-center text-xs font-inter -ml-1">
-              +{extraCount}
-            </span>
-          )}
-        </div>
-
-        <p className="font-inter text-xs text-text-secondary">Created by {group.owner}</p>
-      </div>
-    </Link>
+    </>
   );
 }
