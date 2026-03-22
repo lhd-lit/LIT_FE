@@ -1,20 +1,15 @@
 import { useState } from "react";
 import searchIcon from "../../../shared/assets/searchIcon.svg";
-
-type Comment = {
-  id: string;
-  author: string;
-  authorInitials: string;
-  content: string;
-  timestamp: string;
-  replies?: Comment[];
-};
+import type { GroupChatComment } from "../types";
 
 type GroupChatSidebarProps = {
-  comments: Comment[];
-  onSendComment?: (content: string) => void;
-  onReply?: (commentId: string, content: string) => void;
+  comments: GroupChatComment[];
+  onSendComment?: (content: string) => void | Promise<void>;
+  onReply?: (commentId: string, content: string) => void | Promise<void>;
   onClose?: () => void;
+  sending?: boolean;
+  commentsLoading?: boolean;
+  commentsError?: string | null;
 };
 
 export function GroupChatSidebar({
@@ -22,6 +17,9 @@ export function GroupChatSidebar({
   onSendComment,
   onReply,
   onClose,
+  sending = false,
+  commentsLoading = false,
+  commentsError = null,
 }: GroupChatSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [newComment, setNewComment] = useState("");
@@ -68,6 +66,14 @@ export function GroupChatSidebar({
       </div>
 
       <div className="flex-1 px-6 py-6 space-y-6">
+        {commentsError && (
+          <p className="text-xs text-red-600 font-inter" role="alert">
+            {commentsError}
+          </p>
+        )}
+        {commentsLoading && (
+          <p className="text-xs text-text-secondary font-inter">댓글을 불러오는 중…</p>
+        )}
         <div className="flex items-center gap-2 px-3 h-9 rounded-lg border border-border bg-white">
           <img src={searchIcon} alt="search" className="w-4 h-4" />
           <input
@@ -86,18 +92,27 @@ export function GroupChatSidebar({
               <div className="w-8 h-8 rounded-full bg-primary text-white text-xs font-inter flex items-center justify-center flex-shrink-0">
                 {comment.authorInitials}
               </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-inter font-medium text-text-primary">{comment.author}</span>
-                  <span className="text-xs font-inter text-text-tertiary">{comment.timestamp}</span>
+              <div className="flex-1 min-w-0">
+                <div className="mb-1">
+                  <span className="text-sm font-inter font-medium text-text-primary break-keep [overflow-wrap:anywhere]">
+                    {comment.author}
+                  </span>
                 </div>
                 <p className="text-sm font-inter text-text-primary leading-relaxed">{comment.content}</p>
-                <button
-                  onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-                  className="mt-2 text-xs font-inter text-text-secondary hover:text-primary transition"
-                >
-                  ← Reply
-                </button>
+                <div className="mt-2 flex items-center justify-between gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
+                    className="text-xs font-inter text-text-secondary hover:text-primary transition shrink-0"
+                  >
+                    ← Reply
+                  </button>
+                  {comment.timestamp ? (
+                    <span className="text-xs font-inter text-text-tertiary whitespace-nowrap tabular-nums text-right">
+                      {comment.timestamp}
+                    </span>
+                  ) : null}
+                </div>
                 {replyingTo === comment.id && (
                   <div className="mt-2 space-y-2">
                     <textarea
@@ -109,8 +124,10 @@ export function GroupChatSidebar({
                     />
                     <div className="flex gap-2">
                       <button
-                        onClick={() => handleReplySubmit(comment.id)}
-                        className="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-inter hover:bg-primary/90 transition"
+                        type="button"
+                        disabled={sending}
+                        onClick={() => void handleReplySubmit(comment.id)}
+                        className="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-inter hover:bg-primary/90 transition disabled:opacity-50"
                       >
                         Send
                       </button>
@@ -135,12 +152,18 @@ export function GroupChatSidebar({
                     <div className="w-6 h-6 rounded-full bg-primary/70 text-white text-xs font-inter flex items-center justify-center flex-shrink-0">
                       {reply.authorInitials}
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-inter font-medium text-text-primary">{reply.author}</span>
-                        <span className="text-xs font-inter text-text-tertiary">{reply.timestamp}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="mb-1">
+                        <span className="text-xs font-inter font-medium text-text-primary break-keep [overflow-wrap:anywhere]">
+                          {reply.author}
+                        </span>
                       </div>
                       <p className="text-xs font-inter text-text-primary leading-relaxed">{reply.content}</p>
+                      {reply.timestamp ? (
+                        <p className="mt-1 text-xs font-inter text-text-tertiary whitespace-nowrap tabular-nums text-right">
+                          {reply.timestamp}
+                        </p>
+                      ) : null}
                     </div>
                   </div>
                 ))}
@@ -162,9 +185,10 @@ export function GroupChatSidebar({
           />
           <button
             type="submit"
-            className="w-full px-4 py-2 rounded-lg bg-primary text-white text-sm font-inter hover:bg-primary/90 transition"
+            disabled={sending}
+            className="w-full px-4 py-2 rounded-lg bg-primary text-white text-sm font-inter hover:bg-primary/90 transition disabled:opacity-50"
           >
-            Send Comment
+            {sending ? "Sending…" : "Send Comment"}
           </button>
         </form>
       </div>

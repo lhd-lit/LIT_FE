@@ -9,30 +9,31 @@ import { ParticipantsList } from "../../features/brainstorming/components/Partic
 import { GroupChatSidebar } from "../../features/brainstorming/components/GroupChatSidebar";
 import { useStudyGroup } from "../../features/brainstorming/hooks/useStudyGroup";
 import { useGroupDocumentFile } from "../../features/brainstorming/hooks/useGroupDocumentFile";
+import { useDocumentComments } from "../../features/brainstorming/hooks/useDocumentComments";
 import { usePdfViewer } from "../../features/focusing/hooks/usePdfViewer";
 import { downloadFile } from "../../shared/utils/file.utils";
+import { getApiErrorMessage } from "../../shared/utils/apiError";
 import previousArrowIcon from "../../shared/assets/previousArrowIcon.svg";
-
-type Comment = {
-  id: string;
-  author: string;
-  authorInitials: string;
-  content: string;
-  timestamp: string;
-  replies?: Comment[];
-};
 
 export default function GroupStudyPage() {
   const { groupId, workId } = useParams<{ groupId: string; workId: string }>();
   const [isChatOpen, setIsChatOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [comments, setComments] = useState<Comment[]>([]);
-  
+
   const { group, works, loading: groupLoading, error: groupError } = useStudyGroup(groupId);
   const { fileUrl, loading: fileLoading, error: fileError } = useGroupDocumentFile(groupId, workId);
   const pdfViewer = usePdfViewer();
   
   const work = works.find((w) => w && w.id === workId);
+
+  const {
+    comments,
+    loading: commentsLoading,
+    error: commentsError,
+    sending: commentsSending,
+    sendRootComment,
+    sendReply,
+  } = useDocumentComments(groupId, workId);
 
   // 파일 URL이 변경되면 PDF 뷰어 리셋
   useEffect(() => {
@@ -66,32 +67,22 @@ export default function GroupStudyPage() {
   const loading = fileLoading && !fileUrl;
   const error = fileError || pdfViewer.error;
 
-  const handleSendComment = (content: string) => {
-    const newComment: Comment = {
-      id: `c${Date.now()}`,
-      author: "You",
-      authorInitials: "YO",
-      content,
-      timestamp: new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" }),
-    };
-    setComments([...comments, newComment]);
+  const handleSendComment = async (content: string) => {
+    try {
+      await sendRootComment(content);
+    } catch (e) {
+      alert(getApiErrorMessage(e, "댓글을 등록하지 못했습니다."));
+      throw e;
+    }
   };
 
-  const handleReply = (commentId: string, content: string) => {
-    const newReply: Comment = {
-      id: `r${Date.now()}`,
-      author: "You",
-      authorInitials: "YO",
-      content,
-      timestamp: new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" }),
-    };
-    setComments(
-      comments.map((comment) =>
-        comment.id === commentId
-          ? { ...comment, replies: [...(comment.replies || []), newReply] }
-          : comment
-      )
-    );
+  const handleReply = async (commentId: string, content: string) => {
+    try {
+      await sendReply(commentId, content);
+    } catch (e) {
+      alert(getApiErrorMessage(e, "답글을 등록하지 못했습니다."));
+      throw e;
+    }
   };
 
   return (
@@ -168,6 +159,9 @@ export default function GroupStudyPage() {
           onSendComment={handleSendComment}
           onReply={handleReply}
           onClose={() => setIsChatOpen(false)}
+          sending={commentsSending}
+          commentsLoading={commentsLoading}
+          commentsError={commentsError}
         />
       ) : (
         <button

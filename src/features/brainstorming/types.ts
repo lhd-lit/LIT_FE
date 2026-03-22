@@ -27,4 +27,14 @@ export type GroupWork = {
   isPinned?: boolean;
 };
 
+/** 그룹 문서 댓글 사이드바(DocumentComment API ↔ UI) */
+export type GroupChatComment = {
+  id: string;
+  author: string;
+  authorInitials: string;
+  content: string;
+  timestamp: string;
+  replies?: GroupChatComment[];
+};
+
 
