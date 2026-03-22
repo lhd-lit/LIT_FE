@@ -25,25 +25,43 @@ const isDev = process.env.NODE_ENV === "development" || !app.isPackaged;
 // 메인 윈도우 참조
 let mainWindow: BrowserWindow | null = null;
 
+function resolveAppIcon(): string | undefined {
+  if (app.isPackaged) {
+    const ico = join(process.resourcesPath, "appLogo.ico");
+    if (existsSync(ico)) return ico;
+    const png = join(process.resourcesPath, "appLogo.png");
+    if (existsSync(png)) return png;
+    return undefined;
+  }
+  const devIco = join(__dirname, "../public/appLogo.ico");
+  if (existsSync(devIco)) return devIco;
+  const devPng = join(__dirname, "../public/appLogo.png");
+  if (existsSync(devPng)) return devPng;
+  return undefined;
+}
+
 /**
  * 메인 윈도우 생성
  */
 const createWindow = () => {
   // preload 스크립트 경로 설정
   // __dirname은 dist-electron 폴더를 가리킴 (개발/프로덕션 모두)
-  // CommonJS로 컴파일되므로 .cjs 확장자 사용
-  const preloadPath = join(__dirname, "preload.cjs");
+  // dist-electron/package.json(type: commonjs)로 .js 출력이 CJS로 실행됨
+  const preloadPath = join(__dirname, "preload.js");
   
   // preload 파일 존재 확인
   if (!existsSync(preloadPath)) {
     console.error(`Preload 파일을 찾을 수 없습니다: ${preloadPath}`);
   }
 
+  const icon = resolveAppIcon();
+
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
     minWidth: 800,
     minHeight: 600,
+    ...(icon ? { icon } : {}),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
