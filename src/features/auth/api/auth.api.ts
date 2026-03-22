@@ -2,11 +2,12 @@ import apiClient from '../../../api/client';
 import { getToken, setToken, removeToken } from '../../../lib/token';
 
 /**
- * JWT 토큰 페이로드
+ * JWT 토큰 페이로드 (백엔드 JwtTokenProvider: sub = userId, email = 별도 클레임)
  */
 interface JWTPayload {
-  sub: string; // 이메일
+  sub: string;
   role: string;
+  email?: string;
   iat?: number;
   exp?: number;
 }
@@ -115,15 +116,28 @@ export const getCurrentUser = async (): Promise<{ email: string; role: string; u
     return null;
   }
 
+  const userId = Number(payload.sub);
   const result = {
-    email: payload.email || payload.sub, // email 필드가 있으면 사용, 없으면 sub 사용
+    email: typeof payload.email === 'string' ? payload.email : '',
     role: payload.role || 'USER',
-    userId: payload.sub ? parseInt(payload.sub, 10) : undefined,
+    userId: Number.isFinite(userId) ? userId : undefined,
   };
-  
+
   console.log('[getCurrentUser] 반환값:', result);
   return result;
 };
+
+/**
+ * JWT에서 로그인한 사용자 ID (sub)
+ */
+export function getUserIdFromToken(): number | null {
+  const token = getToken();
+  if (!token) return null;
+  const payload = parseJWT(token);
+  if (!payload?.sub) return null;
+  const id = Number(payload.sub);
+  return Number.isFinite(id) ? id : null;
+}
 
 /**
  * JWT 토큰 유효성 확인
