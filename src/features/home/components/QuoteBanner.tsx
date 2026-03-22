@@ -1,8 +1,11 @@
-export function QuoteBanner(){
+import { useRandomQuote } from "../hooks/useRandomQuote";
 
-    return(
+export function QuoteBanner() {
+  const { quote, loading, error } = useRandomQuote();
 
-        <section className="
+  return (
+    <section
+      className="
             flex 
             flex-col 
             justify-center 
@@ -14,16 +17,26 @@ export function QuoteBanner(){
             rounded-2xl
             shadow-lg
             m-8
-        ">
+        "
+    >
+      {loading && (
+        <p className="font-inter text-text-secondary text-sm animate-pulse">명언을 불러오는 중…</p>
+      )}
 
-            <p className="font-playfair italic text-text-primary text-xl">
-                "To be yourself in a world that is constantly trying to make you something else is the greatest accomplishment."
-            </p>
+      {!loading && error && (
+        <p className="font-inter text-text-secondary text-sm text-center">{error}</p>
+      )}
 
-            <p className="mt-4 font-inter italic text-text-secondary">
-                Ralph Waldo Emerson, Self-Reliance (1841)
-            </p>
-
-        </section>
-    )
+      {!loading && !error && quote && (
+        <>
+          <p className="font-playfair italic text-text-primary text-xl text-center max-w-3xl">
+            &ldquo;{quote.content}&rdquo;
+          </p>
+          <p className="mt-4 font-inter italic text-text-secondary text-center">
+            {[quote.author, quote.source].filter(Boolean).join(", ")}
+          </p>
+        </>
+      )}
+    </section>
+  );
 }

@@ -3,14 +3,19 @@ import type { Card, BrainStormingCard } from "../types"
 import type { ReactNode } from "react";
 
 type BookmarkedSectionProps = {
+  title: string;
+  cards: Card[];
+  renderBookmarkedMetaData?: (card: BrainStormingCard) => ReactNode;
+  /** 카드 클릭 시 (예: Self Study → 학습 화면으로 이동) */
+  onBookmarkedCardClick?: (card: Card) => void;
+};
 
-    title : string;
-    cards : Card[];
-    renderBookmarkedMetaData?: (card: BrainStormingCard) => ReactNode;
-
-}
-
-export function BookmarkedSection({ title, cards, renderBookmarkedMetaData }: BookmarkedSectionProps) {
+export function BookmarkedSection({
+  title,
+  cards,
+  renderBookmarkedMetaData,
+  onBookmarkedCardClick,
+}: BookmarkedSectionProps) {
     // null이나 undefined 항목 필터링
     const validCards = (cards || []).filter((card) => card != null && card.id != null);
 
@@ -39,9 +44,36 @@ export function BookmarkedSection({ title, cards, renderBookmarkedMetaData }: Bo
                     gap-4
                 ">
                     {validCards.map((card) => (
-                        <StudyCard key={card.id} card={card} variant="grid">
-                            {renderBookmarkedMetaData?.(card as BrainStormingCard)}
-                        </StudyCard>
+                        <div
+                            key={card.id}
+                            className={onBookmarkedCardClick ? "cursor-pointer" : undefined}
+                            onClick={
+                              onBookmarkedCardClick
+                                ? () => onBookmarkedCardClick(card)
+                                : undefined
+                            }
+                            onKeyDown={
+                              onBookmarkedCardClick
+                                ? (e) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                      e.preventDefault();
+                                      onBookmarkedCardClick(card);
+                                    }
+                                  }
+                                : undefined
+                            }
+                            role={onBookmarkedCardClick ? "button" : undefined}
+                            tabIndex={onBookmarkedCardClick ? 0 : undefined}
+                            aria-label={
+                              onBookmarkedCardClick
+                                ? `Open ${card.title}`
+                                : undefined
+                            }
+                        >
+                            <StudyCard card={card} variant="grid">
+                                {renderBookmarkedMetaData?.(card as BrainStormingCard)}
+                            </StudyCard>
+                        </div>
                     ))}
                 </div>
             )}

@@ -1,58 +1,38 @@
 import type { Card, BrainStormingCard } from '../types';
-import type { BookmarkResponse } from '../api/home.api';
+import type { BookmarkListItem } from '../../focusing/api/bookmark.dto';
 import type { SelfStudyResponse } from '../../focusing/types';
-import type { StudyGroupResponse } from '../../brainstorming/api/groups.api';
+import type { StudyGroupResponse } from '../../brainstorming/api/groups.dto';
 import defaultThumbnail from '../../../mock/book1.jpg';
 
 /**
- * 북마크 응답을 Card 타입으로 변환
+ * GET /api/bookmark 항목(GetBookmarkListResponse) → Focusing 카드
  */
-export const convertBookmarkToCard = (
-  bookmark: BookmarkResponse | null | undefined
-): Card | BrainStormingCard | null => {
-  if (!bookmark) {
+export const selfStudyBookmarkToCard = (item: BookmarkListItem | null | undefined): Card | null => {
+  if (!item || item.selfStudyId == null) {
     return null;
   }
 
-  if (bookmark.type === 'SELF_STUDY' && bookmark.selfStudyId != null) {
-    // SelfStudy 북마크
-    const isImageFile = bookmark.originalFileName && /\.(jpg|jpeg|png|gif|webp)$/i.test(bookmark.originalFileName);
-    const thumbnail = isImageFile ? bookmark.originalFileName : defaultThumbnail;
-
-    return {
-      id: bookmark.selfStudyId.toString(),
-      title: bookmark.title || '',
-      author: bookmark.writerName || '',
-      thumbnail: thumbnail || '',
-    };
-  } else if (bookmark.type === 'GROUP' && bookmark.studyGroupId != null) {
-    // Group 북마크
-    return {
-      id: bookmark.studyGroupId.toString(),
-      title: bookmark.title || '',
-      author: bookmark.ownerName || '',
-      thumbnail: defaultThumbnail,
-      members: bookmark.memberCount || 0,
-      comments: 0, // 북마크 응답에 comments 정보가 없으므로 기본값
-    } as BrainStormingCard;
-  }
-
-  return null;
+  return {
+    id: item.selfStudyId.toString(),
+    title: item.selfStudyTitle || '',
+    author: '',
+    thumbnail: defaultThumbnail,
+  };
 };
 
 /**
- * 북마크 목록을 Card 목록으로 변환
+ * SelfStudy 즐겨찾기 목록을 Card 목록으로 변환
  */
 export const convertBookmarksToCards = (
-  bookmarks: BookmarkResponse[]
-): Array<Card | BrainStormingCard> => {
-  if (!Array.isArray(bookmarks)) {
+  items: BookmarkListItem[]
+): Card[] => {
+  if (!Array.isArray(items)) {
     return [];
   }
 
-  return bookmarks
-    .map(convertBookmarkToCard)
-    .filter((card): card is Card | BrainStormingCard => card !== null);
+  return items
+    .map(selfStudyBookmarkToCard)
+    .filter((card): card is Card => card !== null);
 };
 
 /**

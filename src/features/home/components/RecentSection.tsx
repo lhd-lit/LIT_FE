@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { StudyCard } from "../../../shared/components/StudyCard";
 import type { Card, BrainStormingCard } from "../types"
@@ -21,11 +22,22 @@ type RecentSectionProps = {
     loading?: boolean;
     error?: string | null;
     recentContinuePath?: (card: Card) => string;
+    onRecentContinue?: (card: Card) => void | Promise<void>;
     renderRecentMetaData?: (card: BrainStormingCard) => ReactNode;
 }
 
-export function RecentSection({ card, title, actionLabel, loading, error, recentContinuePath, renderRecentMetaData }: RecentSectionProps) {
+export function RecentSection({
+    card,
+    title,
+    actionLabel,
+    loading,
+    error,
+    recentContinuePath,
+    onRecentContinue,
+    renderRecentMetaData,
+}: RecentSectionProps) {
     const navigate = useNavigate();
+    const [actionBusy, setActionBusy] = useState(false);
 
     const heading = (
         <h3 className="
@@ -73,10 +85,24 @@ export function RecentSection({ card, title, actionLabel, loading, error, recent
     }
 
     const lastOpened = formatLastViewed(card.lastViewedAt);
-    const onContinue =
-        recentContinuePath != null
-            ? () => navigate(recentContinuePath(card))
-            : undefined;
+
+    const handleContinue = async () => {
+        if (actionBusy) return;
+        if (onRecentContinue) {
+            setActionBusy(true);
+            try {
+                await onRecentContinue(card);
+            } finally {
+                setActionBusy(false);
+            }
+            return;
+        }
+        if (recentContinuePath) {
+            navigate(recentContinuePath(card));
+        }
+    };
+
+    const hasContinue = Boolean(onRecentContinue || recentContinuePath);
 
     return (
         <div className="w-full p-6">
@@ -86,8 +112,10 @@ export function RecentSection({ card, title, actionLabel, loading, error, recent
                 key={card.id}
                 variant="horizontal"
                 card={card}
-                actionLabel={actionLabel}
-                onActionClick={onContinue}
+                actionLabel={actionBusy ? "Opening…" : actionLabel}
+                onCardClick={hasContinue ? handleContinue : undefined}
+                onActionClick={hasContinue ? handleContinue : undefined}
+                actionBusy={actionBusy}
                 metadata={lastOpened ? { lastOpened } : undefined}
             >
                 {renderRecentMetaData?.(card as BrainStormingCard)}
