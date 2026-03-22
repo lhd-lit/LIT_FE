@@ -5,12 +5,38 @@ type StorageUsageCardProps = {
   stats: StorageStats;
 };
 
-export function StorageUsageCard({ stats }: StorageUsageCardProps) {
-  const percentUsed = Math.min(100, Math.round((stats.used / stats.total) * 100));
-  const available = stats.total - stats.used;
+function formatStorageAmount(value: number, unit: StorageStats['unit']): string {
+  if (!Number.isFinite(value)) return `0 ${unit}`;
+  if (unit === 'GB') {
+    const opts: Intl.NumberFormatOptions =
+      value > 0 && value < 1
+        ? { minimumFractionDigits: 2, maximumFractionDigits: 4 }
+        : { minimumFractionDigits: 2, maximumFractionDigits: 2 };
+    return `${value.toLocaleString('en-US', opts)} GB`;
+  }
+  return `${value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} MB`;
+}
 
-  const formatValue = (value: number) =>
-    `${value.toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 0 })} ${stats.unit}`;
+function formatPercentUsed(used: number, total: number): string {
+  if (total <= 0 || !Number.isFinite(used)) return '0';
+  const p = Math.min(100, Math.max(0, (used / total) * 100));
+  if (p === 0) return '0';
+  if (p < 0.01) return p.toFixed(3);
+  if (p < 1) return p.toFixed(2);
+  if (p < 10) return p.toFixed(1);
+  return String(Math.round(p));
+}
+
+export function StorageUsageCard({ stats }: StorageUsageCardProps) {
+  const percentRaw =
+    stats.total > 0 && Number.isFinite(stats.used)
+      ? Math.min(100, (stats.used / stats.total) * 100)
+      : 0;
+  /** 아주 작은 사용량도 막대에 보이도록 */
+  const barPercent =
+    percentRaw > 0 ? Math.min(100, Math.max(percentRaw, 0.35)) : 0;
+  const available = Math.max(0, stats.total - stats.used);
+  const formatValue = (value: number) => formatStorageAmount(value, stats.unit);
 
   return (
     <section className="
@@ -39,12 +65,12 @@ export function StorageUsageCard({ stats }: StorageUsageCardProps) {
       <div className="h-2 rounded-full bg-primary/20 overflow-hidden">
         <div
           className="h-full bg-primary"
-          style={{ width: `${percentUsed}%` }}
-          aria-label={`Used ${percentUsed}% of storage`}
+          style={{ width: `${barPercent}%` }}
+          aria-label={`Used ${formatPercentUsed(stats.used, stats.total)}% of storage`}
         />
       </div>
       <div className="flex items-center justify-between text-xs text-text-primary font-inter">
-        <span>{percentUsed}% used</span>
+        <span>{formatPercentUsed(stats.used, stats.total)}% used</span>
         <span>{formatValue(available)} available</span>
       </div>
 

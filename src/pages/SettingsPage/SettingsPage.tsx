@@ -77,7 +77,7 @@ export default function SettingsPage() {
           </div>
         )}
         {!storageLoading && storageStats && <StorageUsageCard stats={storageStats} />}
-        <DeleteAccountCard />
+        <DeleteAccountCard email={user.email} />
       </div>
     </div>
   );
