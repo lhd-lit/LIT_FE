@@ -31,6 +31,7 @@ export function UploadWorkModal({
   const [description, setDescription] = useState("");
   const [fileName, setFileName] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   if (!open) return null;
 
@@ -42,8 +43,18 @@ export function UploadWorkModal({
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    setFormError(null);
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) {
+      setFormError('제목을 입력해주세요.');
+      return;
+    }
     const file = fileInputRef.current?.files?.[0] ?? null;
-    onSubmit?.({ title, description, file });
+    if (!file) {
+      setFormError('파일을 선택해주세요.');
+      return;
+    }
+    onSubmit?.({ title: trimmedTitle, description, file });
     onClose();
   };
 
@@ -216,6 +227,12 @@ export function UploadWorkModal({
               "
             />
           </div>
+
+          {formError && (
+            <p className="text-sm text-red-600 font-inter" role="alert">
+              {formError}
+            </p>
+          )}
 
           <div className="flex justify-end gap-3 pt-2">
             <button

@@ -23,7 +23,7 @@ export default function GroupDetailPage() {
   const [, setBookmarkTick] = useState(0);
   const navigate = useNavigate();
   const { group, works, loading, error, refetch } = useStudyGroup(groupId);
-  const { handleAddDocument, loading: uploadLoading, error: uploadError } = useAddGroupDocument(
+  const { handleAddDocument } = useAddGroupDocument(
     groupId,
     refetch
   );

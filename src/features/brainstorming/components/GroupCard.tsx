@@ -1,40 +1,37 @@
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import membersIcon from "../../../shared/assets/membersIcon.svg";
 import workingIcon from "../../../shared/assets/workingIcon.svg";
 import pinnedIcon from "../../../shared/assets/pinnedIcon.svg";
 import type { StudyGroup } from "../types";
-import {
-  isStudyGroupBookmarked,
-  toggleStudyGroupBookmark,
-} from "../utils/studyGroupBookmarks.utils";
 import { GroupCardMenu } from "./GroupCardMenu";
 
 type GroupCardProps = {
   group: StudyGroup;
   onLeaveSuccess?: () => void;
-  /** 즐겨찾기 토글 시 목록 재분할용 */
-  onFavoriteChange?: () => void;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
+  favoriteDisabled?: boolean;
 };
 
 const MAX_VISIBLE_PARTICIPANTS = 5;
 
-export function GroupCard({ group, onLeaveSuccess, onFavoriteChange }: GroupCardProps) {
+export function GroupCard({
+  group,
+  onLeaveSuccess,
+  isFavorite = false,
+  onToggleFavorite,
+  favoriteDisabled = false,
+}: GroupCardProps) {
   const navigate = useNavigate();
-  const [favorite, setFavorite] = useState(() => isStudyGroupBookmarked(group.id));
-
-  useEffect(() => {
-    setFavorite(isStudyGroupBookmarked(group.id));
-  }, [group.id]);
+  const favorite = !!group?.id && isFavorite;
 
   if (!group || !group.id) {
     return null;
   }
 
   const handleToggleFavorite = () => {
-    const next = toggleStudyGroupBookmark(group.id);
-    setFavorite(next);
-    onFavoriteChange?.();
+    if (favoriteDisabled) return;
+    onToggleFavorite?.();
   };
 
   const visibleParticipants = (group.participants || []).slice(0, MAX_VISIBLE_PARTICIPANTS);
@@ -85,6 +82,7 @@ export function GroupCard({ group, onLeaveSuccess, onFavoriteChange }: GroupCard
               onLeaveSuccess={onLeaveSuccess}
               isFavorite={favorite}
               onToggleFavorite={handleToggleFavorite}
+              favoriteDisabled={favoriteDisabled}
             />
           </div>
         </header>

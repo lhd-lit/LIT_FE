@@ -1,9 +1,12 @@
 import apiClient from '../../../api/client';
+import type { PresignedUploadResponse } from '../../../shared/types/presignedUpload';
+import { normalizeUploadOriginalFileName, uploadFileToS3PresignedPut } from '../../../shared/utils/file.utils';
 import type {
   GlobalResponse,
   SelfStudyListResponse,
   CreateSelfStudyResponse,
   SelfStudyFileResponse,
+  SelfStudyConfirmRequest,
 } from '../types';
 
 /**
@@ -20,32 +23,50 @@ export const getMySelfStudyList = async (
 };
 
 /**
- * SelfStudy 생성
+ * 업로드용 Presigned URL 발급 (파일명은 confirm 시와 동일한 문자열 사용)
+ */
+export const getSelfStudyPresignedUploadUrl = async (
+  originalFileName: string
+): Promise<PresignedUploadResponse> => {
+  const response = await apiClient.post<GlobalResponse<PresignedUploadResponse>>(
+    '/api/selfStudy/presigned-url',
+    undefined,
+    { params: { originalFileName } }
+  );
+  return response.data.result;
+};
+
+/**
+ * S3 업로드 완료 후 SelfStudy DB 저장
+ */
+export const confirmSelfStudy = async (
+  body: SelfStudyConfirmRequest
+): Promise<CreateSelfStudyResponse> => {
+  const response = await apiClient.post<GlobalResponse<CreateSelfStudyResponse>>(
+    '/api/selfStudy/confirm',
+    body
+  );
+  return response.data.result;
+};
+
+/**
+ * SelfStudy 생성: Presigned URL 발급 → S3 PUT → confirm
  */
 export const createSelfStudy = async (
   title: string,
-  description?: string,
-  file?: File
+  description: string | undefined,
+  file: File
 ): Promise<CreateSelfStudyResponse> => {
-  const formData = new FormData();
-  // Spring @RequestPart("request") — 그룹 문서 업로드(addGroupDocument)와 동일한 멀티파트 형식
-  const requestPayload = JSON.stringify({
+  const originalFileName = normalizeUploadOriginalFileName(file);
+  const presigned = await getSelfStudyPresignedUploadUrl(originalFileName);
+  await uploadFileToS3PresignedPut(presigned.presignedUrl, file);
+  return confirmSelfStudy({
     title,
     description: description ?? '',
+    s3Key: presigned.s3Key,
+    originalFileName: presigned.originalFileName,
+    fileSize: file.size,
   });
-  formData.append(
-    'request',
-    new Blob([requestPayload], { type: 'application/json' })
-  );
-  if (file) {
-    formData.append('file', file);
-  }
-
-  const response = await apiClient.post<GlobalResponse<CreateSelfStudyResponse>>(
-    '/api/selfStudy',
-    formData
-  );
-  return response.data.result;
 };
 
 /**

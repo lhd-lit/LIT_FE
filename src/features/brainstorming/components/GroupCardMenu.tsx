@@ -11,6 +11,7 @@ type GroupCardMenuProps = {
   onLeaveSuccess?: () => void;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
+  favoriteDisabled?: boolean;
 };
 
 /**
@@ -21,6 +22,7 @@ export function GroupCardMenu({
   onLeaveSuccess,
   isFavorite = false,
   onToggleFavorite,
+  favoriteDisabled = false,
 }: GroupCardMenuProps) {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -98,6 +100,7 @@ export function GroupCardMenu({
         <div className="p-2 border-b border-border">
           <button
             type="button"
+            disabled={favoriteDisabled}
             className="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-background transition text-left"
             onClick={() => {
               onToggleFavorite();

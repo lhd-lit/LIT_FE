@@ -14,7 +14,7 @@ export const useCreateGroup = (onSuccess?: () => void) => {
 
   const handleCreateGroup = async (payload: CreateGroupPayload) => {
     if (!payload.name.trim()) {
-      setError('사용자의 이메일을 입력해주세요.');
+      setError('그룹 이름을 입력해주세요.');
       return;
     }
 

@@ -63,3 +63,12 @@ export interface GroupFileResponse {
   description: string;
   presignedUrl: string;
 }
+
+/** POST /api/groups/{groupId}/documents/confirm 요청 본문 */
+export interface GroupDocumentConfirmRequest {
+  title: string;
+  description?: string;
+  s3Key: string;
+  originalFileName: string;
+  fileSize: number;
+}

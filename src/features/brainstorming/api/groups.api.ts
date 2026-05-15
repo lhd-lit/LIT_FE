@@ -1,8 +1,11 @@
 import apiClient from '../../../api/client';
 import type { GlobalResponse } from '../../focusing/types';
+import type { PresignedUploadResponse } from '../../../shared/types/presignedUpload';
+import { normalizeUploadOriginalFileName, uploadFileToS3PresignedPut } from '../../../shared/utils/file.utils';
 import type {
   AddGroupDocumentResponse,
   CreateGroupResponse,
+  GroupDocumentConfirmRequest,
   GroupDocumentListResponse,
   GroupFileResponse,
   StudyGroupListResponse,
@@ -13,6 +16,7 @@ export type {
   AddGroupDocumentResponse,
   CreateGroupRequest,
   CreateGroupResponse,
+  GroupDocumentConfirmRequest,
   GroupDocumentListResponse,
   GroupDocumentResponse,
   GroupFileResponse,
@@ -65,7 +69,36 @@ export const createGroup = async (
 };
 
 /**
- * 그룹에 문서 추가
+ * 그룹 문서 업로드용 Presigned URL 발급
+ */
+export const getGroupDocumentPresignedUploadUrl = async (
+  groupId: number | string,
+  originalFileName: string
+): Promise<PresignedUploadResponse> => {
+  const response = await apiClient.post<GlobalResponse<PresignedUploadResponse>>(
+    `/api/groups/${groupId}/documents/presigned-url`,
+    undefined,
+    { params: { originalFileName } }
+  );
+  return response.data.result;
+};
+
+/**
+ * S3 업로드 완료 후 그룹 문서 DB 저장
+ */
+export const confirmGroupDocument = async (
+  groupId: number | string,
+  body: GroupDocumentConfirmRequest
+): Promise<AddGroupDocumentResponse> => {
+  const response = await apiClient.post<GlobalResponse<AddGroupDocumentResponse>>(
+    `/api/groups/${groupId}/documents/confirm`,
+    body
+  );
+  return response.data.result;
+};
+
+/**
+ * 그룹에 문서 추가: Presigned URL 발급 → S3 PUT → confirm
  */
 export const addGroupDocument = async (
   groupId: number | string,
@@ -73,15 +106,16 @@ export const addGroupDocument = async (
   description: string | undefined,
   file: File
 ): Promise<AddGroupDocumentResponse> => {
-  const formData = new FormData();
-  formData.append('request', JSON.stringify({ title, description: description || '' }));
-  formData.append('file', file);
-
-  const response = await apiClient.post<GlobalResponse<AddGroupDocumentResponse>>(
-    `/api/groups/${groupId}/documents`,
-    formData
-  );
-  return response.data.result;
+  const originalFileName = normalizeUploadOriginalFileName(file);
+  const presigned = await getGroupDocumentPresignedUploadUrl(groupId, originalFileName);
+  await uploadFileToS3PresignedPut(presigned.presignedUrl, file);
+  return confirmGroupDocument(groupId, {
+    title,
+    description: description ?? '',
+    s3Key: presigned.s3Key,
+    originalFileName: presigned.originalFileName,
+    fileSize: file.size,
+  });
 };
 
 /**

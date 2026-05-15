@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import DefaultAvatar from "../assets/defaultAvatar.png";
 import { getCurrentUser } from "../../features/auth/api/auth.api";
 
 /**

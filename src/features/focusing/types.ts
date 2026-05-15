@@ -52,3 +52,17 @@ export interface SelfStudyFileResponse {
   description: string;
   presignedUrl: string;
 }
+
+export type SortOption = {
+  value: 'recent' | 'title';
+  label: string;
+};
+
+/** POST /api/selfStudy/confirm 요청 본문 */
+export interface SelfStudyConfirmRequest {
+  title: string;
+  description?: string;
+  s3Key: string;
+  originalFileName: string;
+  fileSize: number;
+}

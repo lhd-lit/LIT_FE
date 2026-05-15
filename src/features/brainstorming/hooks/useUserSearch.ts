@@ -40,15 +40,15 @@ export const useUserSearch = (
       try {
         setLoading(true);
         setError(null);
-        const user = await searchUsers(searchQuery, excludeForApi);
-
-        if (user && !user.alreadySelected) {
-          setUsers([user]);
-        } else {
-          setUsers([]);
-        }
-      } catch (err: any) {
-        // 검색 결과가 없을 수도 있으므로 에러를 무시하거나 빈 배열로 설정
+        const list = await searchUsers(searchQuery);
+        const excludeSet = new Set(
+          excludeForApi?.filter((id) => !Number.isNaN(id)) ?? []
+        );
+        const filtered = list.filter(
+          (u) => !u.alreadySelected && !excludeSet.has(u.userId)
+        );
+        setUsers(filtered);
+      } catch {
         setUsers([]);
         setError(null);
       } finally {

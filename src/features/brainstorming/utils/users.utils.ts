@@ -23,6 +23,7 @@ export const convertUserToMember = (user: UserSearchResponse | null | undefined)
   return {
     id: user.userId.toString(),
     name: user.name || '',
+    email: user.email || '',
     initials: getInitials(user.name || ''),
   };
 };

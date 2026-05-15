@@ -17,6 +17,7 @@ export function CreateGroupModal({ open, onClose }: CreateGroupModalProps) {
   const [description, setDescription] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
+  const [nameError, setNameError] = useState<string | null>(null);
   const { refetch } = useGroupsList();
   const { handleCreateGroup, loading: createLoading, error: createError } = useCreateGroup(() => {
     refetch();
@@ -46,6 +47,11 @@ export function CreateGroupModal({ open, onClose }: CreateGroupModalProps) {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!groupName.trim()) {
+      setNameError('그룹 이름을 입력해주세요.');
+      return;
+    }
+    setNameError(null);
     try {
       await handleCreateGroup({
         name: groupName,
@@ -62,6 +68,7 @@ export function CreateGroupModal({ open, onClose }: CreateGroupModalProps) {
     setDescription("");
     setSearchQuery("");
     setSelectedMembers([]);
+    setNameError(null);
   };
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -112,10 +119,18 @@ export function CreateGroupModal({ open, onClose }: CreateGroupModalProps) {
             </label>
             <input
               value={groupName}
-              onChange={(e) => setGroupName(e.target.value)}
+              onChange={(e) => {
+                setGroupName(e.target.value);
+                if (nameError) setNameError(null);
+              }}
               placeholder="e.g., Modernist Literature Study"
               className="w-full h-10 rounded-lg border-2 border-border px-3 text-sm text-text-primary font-inter placeholder-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary bg-white"
             />
+            {nameError && (
+              <p className="text-sm text-red-600 font-inter" role="alert">
+                {nameError}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -148,7 +163,7 @@ export function CreateGroupModal({ open, onClose }: CreateGroupModalProps) {
             </div>
 
             {/* 검색 결과 표시 */}
-            {searchQuery && availableMembers.length > 0 && (
+            {searchQuery.trim() && availableMembers.length > 0 && (
               <div className="mt-2 border border-border rounded-lg bg-white shadow-sm max-h-40 overflow-y-auto">
                 {availableMembers
                   .filter((member) => member && member.id)
@@ -157,15 +172,27 @@ export function CreateGroupModal({ open, onClose }: CreateGroupModalProps) {
                       key={member.id}
                       type="button"
                       onClick={() => handleMemberSelect(member)}
-                      className="w-full px-3 py-2 text-left hover:bg-background-light flex items-center gap-2"
+                      className="w-full px-3 py-2.5 text-left hover:bg-background-light flex items-center gap-3 min-w-0"
                     >
-                      <span className="h-6 w-6 rounded-full bg-primary text-white flex items-center justify-center text-xs">
+                      <span className="h-8 w-8 shrink-0 rounded-full bg-primary text-white flex items-center justify-center text-xs">
                         {member.initials}
                       </span>
-                      <span className="text-sm text-text-primary">{member.name}</span>
+                      <div className="flex min-w-0 flex-col gap-0.5 text-left">
+                        <span className="text-sm font-medium text-text-primary truncate">
+                          {member.name}
+                        </span>
+                        <span className="text-xs text-text-secondary truncate">
+                          {member.email}
+                        </span>
+                      </div>
                     </button>
                   ))}
               </div>
+            )}
+            {searchQuery.trim() && !searchLoading && availableMembers.length === 0 && (
+              <p className="mt-2 text-xs text-text-secondary font-inter">
+                검색 결과가 없습니다. 이메일 @ 앞부분(예: user@gmail.com → user)으로 검색해 주세요.
+              </p>
             )}
 
             {/* 선택된 멤버 표시 */}
@@ -176,12 +203,17 @@ export function CreateGroupModal({ open, onClose }: CreateGroupModalProps) {
                   .map((member) => (
                     <span
                       key={member.id}
-                      className="inline-flex items-center gap-2 rounded-full bg-background-hover text-text-primary pl-1 pr-3 py-1 text-xs font-inter"
+                      className="inline-flex items-center gap-2 rounded-full bg-background-hover text-text-primary pl-1 pr-3 py-1.5 text-xs font-inter max-w-full"
                     >
-                      <span className="h-6 w-6 rounded-full bg-primary text-white flex items-center justify-center text-xs">
+                      <span className="h-6 w-6 shrink-0 rounded-full bg-primary text-white flex items-center justify-center text-xs">
                         {member.initials}
                       </span>
-                      {member.name}
+                      <span className="flex min-w-0 flex-col leading-tight">
+                        <span className="truncate font-medium">{member.name}</span>
+                        <span className="truncate text-[10px] text-text-secondary">
+                          {member.email}
+                        </span>
+                      </span>
                       <button
                         type="button"
                         onClick={() => handleMemberRemove(member.id)}

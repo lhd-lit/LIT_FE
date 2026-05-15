@@ -1,11 +1,11 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo } from "react";
 import { PageLayout } from "../../shared/components/PageLayout";
 import brainstormingIcon from "../../shared/assets/brainstormingIcon.svg";
 import { CreateGroupButton } from "../../features/brainstorming/components/CreateGroupButton";
 import { CreateGroupModal } from "../../features/brainstorming/components/CreateGroupModal";
 import { GroupCard } from "../../features/brainstorming/components/GroupCard";
 import { useGroupsList } from "../../features/brainstorming/hooks/useGroupsList";
-import { isStudyGroupBookmarked } from "../../features/brainstorming/utils/studyGroupBookmarks.utils";
+import { useGroupBookmarks } from "../../features/brainstorming/hooks/useGroupBookmarks";
 import type { StudyGroup } from "../../features/brainstorming/types";
 
 const CARD_GRID =
@@ -14,10 +14,12 @@ const CARD_GRID =
 export default function BrainStormingPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [bookmarkTick, setBookmarkTick] = useState(0);
   const { groups, loading, error, refetch } = useGroupsList();
-
-  const bumpBookmarks = useCallback(() => setBookmarkTick((t) => t + 1), []);
+  const {
+    bookmarkedGroupIds,
+    toggle: toggleBookmark,
+    isToggling: isBookmarkToggling,
+  } = useGroupBookmarks();
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -44,11 +46,11 @@ export default function BrainStormingPage() {
     const rest: StudyGroup[] = [];
     for (const g of filteredGroups) {
       if (!g?.id) continue;
-      if (isStudyGroupBookmarked(g.id)) fav.push(g);
+      if (bookmarkedGroupIds.has(g.id)) fav.push(g);
       else rest.push(g);
     }
     return { favoriteGroups: fav, otherGroups: rest };
-  }, [filteredGroups, bookmarkTick]);
+  }, [filteredGroups, bookmarkedGroupIds]);
 
   return (
     <>
@@ -86,7 +88,9 @@ export default function BrainStormingPage() {
                       key={group.id}
                       group={group}
                       onLeaveSuccess={refetch}
-                      onFavoriteChange={bumpBookmarks}
+                      isFavorite={bookmarkedGroupIds.has(group.id)}
+                      onToggleFavorite={() => void toggleBookmark(group.id)}
+                      favoriteDisabled={isBookmarkToggling(group.id)}
                     />
                   ) : null
                 )}
@@ -99,7 +103,9 @@ export default function BrainStormingPage() {
                         key={group.id}
                         group={group}
                         onLeaveSuccess={refetch}
-                        onFavoriteChange={bumpBookmarks}
+                        isFavorite={bookmarkedGroupIds.has(group.id)}
+                        onToggleFavorite={() => void toggleBookmark(group.id)}
+                        favoriteDisabled={isBookmarkToggling(group.id)}
                       />
                     ) : null
                   )}
@@ -114,7 +120,9 @@ export default function BrainStormingPage() {
                     key={group.id}
                     group={group}
                     onLeaveSuccess={refetch}
-                    onFavoriteChange={bumpBookmarks}
+                    isFavorite={bookmarkedGroupIds.has(group.id)}
+                    onToggleFavorite={() => void toggleBookmark(group.id)}
+                    favoriteDisabled={isBookmarkToggling(group.id)}
                   />
                 ) : null
               )}
